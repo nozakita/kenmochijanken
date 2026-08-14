@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>剣持じゃんけん</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101114;
+      --panel: #191b20;
+      --text: #f4f5f7;
+      --muted: #a8adb7;
+      --line: #343840;
+      --accent: #f0f0f0;
+      --accent-text: #111216;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main {
+      width: min(900px, 92vw);
+      margin: 0 auto;
+      padding: 56px 0 72px;
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 7vw, 4.5rem);
+      letter-spacing: .04em;
+    }
+    .subtitle {
+      margin: 0 0 36px;
+      color: var(--muted);
+    }
+    .stage {
+      display: grid;
+      place-items: center;
+      min-height: 320px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      overflow: hidden;
+    }
+    #before { padding: 36px 20px; }
+    #playerWrap {
+      display: none;
+      width: 100%;
+    }
+    #player {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+    }
+    .main-button {
+      min-width: min(360px, 80vw);
+      padding: 20px 34px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--accent-text);
+      font: inherit;
+      font-size: clamp(1.2rem, 4vw, 1.65rem);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .main-button:disabled {
+      opacity: .45;
+      cursor: wait;
+    }
+    .secondary {
+      margin-top: 22px;
+      padding: 12px 22px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+    }
+    #againButton { display: none; }
+    #status {
+      min-height: 1.6em;
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+    .small {
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: .8rem;
+    }
+    @media (max-width: 600px) {
+      main { padding-top: 32px; }
+      .stage { min-height: 240px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>剣持じゃんけん</h1>
+    <p class="subtitle">何が出るかは、押してからのお楽しみ。</p>
+
+    <section class="stage">
+      <div id="before">
+        <button id="jankenButton" class="main-button" type="button" disabled>
+          読み込み中…
+        </button>
+        <p id="status" aria-live="polite">
+          YouTubeプレイリストを準備しています。
+        </p>
+      </div>
+
+      <div id="playerWrap">
+        <div id="player"></div>
+      </div>
+    </section>
+
+    <button id="againButton" class="secondary" type="button">
+      もう一回
+    </button>
+
+    <p class="small">テスト版</p>
+  </main>
+
+  <script>
+    const PLAYLIST_ID = "PLGQedG8B-hiE";
+
+    let player;
+    let playlistReady = false;
+    let lastIndex = -1;
+
+    const jankenButton = document.getElementById("jankenButton");
+    const againButton = document.getElementById("againButton");
+    const before = document.getElementById("before");
+    const playerWrap = document.getElementById("playerWrap");
+    const status = document.getElementById("status");
+
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+
+    window.onYouTubeIframeAPIReady = function () {
+      player = new YT.Player("player", {
+        width: "100%",
+        height: "100%",
+        playerVars: {
+          playsinline: 1,
+          rel: 0,
+          modestbranding: 1
+        },
+        events: {
+          onReady: onPlayerReady,
+          onError: onPlayerError
+        }
+      });
+    };
+
+    function onPlayerReady() {
+      player.cuePlaylist({
+        listType: "playlist",
+        list: PLAYLIST_ID,
+        index: 0
+      });
+      waitForPlaylist();
+    }
+
+    function waitForPlaylist(attempt = 0) {
+      const list = player.getPlaylist ? player.getPlaylist() : [];
+
+      if (Array.isArray(list) && list.length > 0) {
+        playlistReady = true;
+        jankenButton.disabled = false;
+        jankenButton.textContent = "じゃんけんする";
+        status.textContent = `${list.length}本の動画を読み込みました。`;
+        return;
+      }
+
+      if (attempt >= 30) {
+        jankenButton.disabled = true;
+        jankenButton.textContent = "読み込み失敗";
+        status.textContent =
+          "プレイリストを読み込めませんでした。公開設定・埋め込み設定・プレイリストIDを確認してください。";
+        return;
+      }
+
+      setTimeout(() => waitForPlaylist(attempt + 1), 300);
+    }
+
+    function chooseRandomIndex(length) {
+      if (length <= 1) return 0;
+
+      let index;
+      do {
+        index = Math.floor(Math.random() * length);
+      } while (index === lastIndex);
+
+      lastIndex = index;
+      return index;
+    }
+
+    function playRandomVideo() {
+      if (!playlistReady || !player) return;
+
+      const list = player.getPlaylist();
+
+      if (!Array.isArray(list) || list.length === 0) {
+        status.textContent = "動画一覧を取得できませんでした。";
+        return;
+      }
+
+      const randomIndex = chooseRandomIndex(list.length);
+
+      before.style.display = "none";
+      playerWrap.style.display = "block";
+      againButton.style.display = "inline-block";
+
+      player.playVideoAt(randomIndex);
+    }
+
+    function onPlayerError(event) {
+      console.error("YouTube player error:", event.data);
+      status.textContent =
+        "この動画は埋め込み再生できない可能性があります。もう一度お試しください。";
+    }
+
+    jankenButton.addEventListener("click", playRandomVideo);
+    againButton.addEventListener("click", playRandomVideo);
+  </script>
+</body>
+</html>

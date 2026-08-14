@@ -65,9 +65,21 @@
       width: 100%;
     }
 
-    #player {
+    #displayPlayer {
       width: 100%;
       aspect-ratio: 16 / 9;
+    }
+
+    /* 再生リスト取得専用。画面外に隠す */
+    #playlistLoaderWrap {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      left: -9999px;
+      top: -9999px;
     }
 
     .main-button {
@@ -121,7 +133,7 @@
       .stage { min-height: 240px; }
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786718002811&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_0000000006208211994ce913677e9420%26fn%3Dindex%25282%2529.html%26cd%3Dattachment%26ts%3D496311%26p%3Dfs%26cid%3D1%26sig%3D680cb343aa29056c39fc5de242ff4f6f8bb7ea3c0703588f4c750a6138f67754%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786718002811&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786718002811&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000004c748206bbe24f76b20d3c56%26fn%3Dindex%25283%2529.html%26cd%3Dattachment%26ts%3D496311%26p%3Dfs%26cid%3D1%26sig%3D078d88a3554cc300727d6ec4150a5ff805bc3881a28b769548b459bfcee77d1f%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786718002811&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 
 <body>
   <main>
@@ -140,7 +152,7 @@
       </div>
 
       <div id="playerWrap">
-        <div id="player"></div>
+        <div id="displayPlayer"></div>
       </div>
     </section>
 
@@ -151,10 +163,17 @@
     <p class="small">テスト版</p>
   </main>
 
+  <!-- 再生リスト取得専用の非表示プレイヤー -->
+  <div id="playlistLoaderWrap" aria-hidden="true">
+    <div id="playlistLoader"></div>
+  </div>
+
   <script>
     const PLAYLIST_ID = "PLGQedG8B-hiE";
 
-    let player;
+    let playlistLoader;
+    let displayPlayer;
+
     let videoIds = [];
     let lastIndex = -1;
 
@@ -164,31 +183,49 @@
     const playerWrap = document.getElementById("playerWrap");
     const status = document.getElementById("status");
 
-    // YouTube IFrame Player APIを読み込む
+    // YouTube IFrame Player API
     const tag = document.createElement("script");
     tag.src = "https://www.youtube.com/iframe_api";
     document.head.appendChild(tag);
 
     window.onYouTubeIframeAPIReady = function () {
-      player = new YT.Player("player", {
+      // 1) 再生リスト取得専用プレイヤー
+      playlistLoader = new YT.Player("playlistLoader", {
+        width: "1",
+        height: "1",
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          playsinline: 1
+        },
+        events: {
+          onReady: onPlaylistLoaderReady,
+          onError: onPlaylistLoaderError
+        }
+      });
+
+      // 2) 実際の表示・再生専用プレイヤー
+      displayPlayer = new YT.Player("displayPlayer", {
         width: "100%",
         height: "100%",
         playerVars: {
+          autoplay: 0,
           playsinline: 1,
           rel: 0,
           modestbranding: 1
         },
         events: {
-          onReady: onPlayerReady,
-          onStateChange: onPlayerStateChange,
-          onError: onPlayerError
+          onReady: onDisplayPlayerReady,
+          onStateChange: onDisplayPlayerStateChange,
+          onError: onDisplayPlayerError
         }
       });
     };
 
-    function onPlayerReady() {
-      // 再生リストは「動画ID一覧を取得するため」だけに読み込む
-      player.cuePlaylist({
+    function onPlaylistLoaderReady() {
+      // このプレイヤーでは再生しない。
+      // 再生リストをcueしてID一覧だけ取得する。
+      playlistLoader.cuePlaylist({
         listType: "playlist",
         list: PLAYLIST_ID,
         index: 0
@@ -197,13 +234,22 @@
       waitForPlaylist();
     }
 
+    function onDisplayPlayerReady() {
+      // 表示用プレイヤーは空のまま待機。
+    }
+
     function waitForPlaylist(attempt = 0) {
-      const list = player.getPlaylist ? player.getPlaylist() : [];
+      const list = playlistLoader && playlistLoader.getPlaylist
+        ? playlistLoader.getPlaylist()
+        : [];
 
       if (Array.isArray(list) && list.length > 0) {
-        // ここで動画ID一覧を保存しておく。
-        // 以後、再生リスト自体ではなく単体動画として再生する。
         videoIds = [...list];
+
+        // 念のため取得後は非表示プレイヤーを停止。
+        try {
+          playlistLoader.stopVideo();
+        } catch (e) {}
 
         jankenButton.disabled = false;
         jankenButton.textContent = "じゃんけんする";
@@ -211,7 +257,7 @@
         return;
       }
 
-      if (attempt >= 30) {
+      if (attempt >= 40) {
         jankenButton.disabled = true;
         jankenButton.textContent = "読み込み失敗";
         status.textContent =
@@ -235,7 +281,7 @@
     }
 
     function playRandomVideo() {
-      if (!player || videoIds.length === 0) return;
+      if (!displayPlayer || videoIds.length === 0) return;
 
       const randomIndex = chooseRandomIndex(videoIds.length);
       const videoId = videoIds[randomIndex];
@@ -244,22 +290,36 @@
       playerWrap.style.display = "block";
       againButton.style.display = "inline-block";
 
-      // 重要：
-      // playVideoAt()ではなく単体動画として読み込む。
-      // これにより動画終了後に再生リストの次の動画へ進まない。
-      player.loadVideoById({
+      status.textContent = "再生中です。";
+
+      // 表示プレイヤーにはプレイリストを一度も読み込ませない。
+      // 単体動画だけをロードして再生する。
+      displayPlayer.loadVideoById({
         videoId: videoId
       });
     }
 
-    function onPlayerStateChange(event) {
+    function onDisplayPlayerStateChange(event) {
       if (event.data === YT.PlayerState.ENDED) {
+        // 念のため明示的に停止。
+        // 表示用プレイヤーにはplaylist contextがないため、
+        // ここから次動画へ進むことはない。
+        try {
+          displayPlayer.stopVideo();
+        } catch (e) {}
+
         status.textContent = "終了しました。「もう一回」で次を引けます。";
       }
     }
 
-    function onPlayerError(event) {
-      console.error("YouTube player error:", event.data);
+    function onPlaylistLoaderError(event) {
+      console.error("Playlist loader error:", event.data);
+      status.textContent =
+        "プレイリストの読み込みでエラーが発生しました。";
+    }
+
+    function onDisplayPlayerError(event) {
+      console.error("Display player error:", event.data);
       status.textContent =
         "この動画は埋め込み再生できない可能性があります。「もう一回」をお試しください。";
     }

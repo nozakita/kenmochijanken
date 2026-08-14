@@ -11,11 +11,13 @@
       color-scheme: dark;
       --bg: #101114;
       --panel: #191b20;
+      --panel2: #20232a;
       --text: #f4f5f7;
       --muted: #a8adb7;
       --line: #343840;
-      --accent: #f0f0f0;
+      --accent: #f2f2f2;
       --accent-text: #111216;
+      --lucky: #f4d35e;
     }
 
     * { box-sizing: border-box; }
@@ -29,21 +31,88 @@
     }
 
     main {
-      width: min(900px, 92vw);
+      width: min(920px, 92vw);
       margin: 0 auto;
-      padding: 56px 0 72px;
+      padding: 40px 0 64px;
       text-align: center;
     }
 
     h1 {
-      margin: 0 0 10px;
-      font-size: clamp(2rem, 7vw, 4.5rem);
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 7vw, 4.2rem);
       letter-spacing: .04em;
     }
 
     .subtitle {
-      margin: 0 0 36px;
+      margin: 0 0 28px;
       color: var(--muted);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      padding: 11px 6px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+    }
+
+    .stat-label {
+      display: block;
+      color: var(--muted);
+      font-size: .72rem;
+      letter-spacing: .05em;
+    }
+
+    .stat-value {
+      display: block;
+      margin-top: 2px;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .controls {
+      margin: 18px 0;
+    }
+
+    .controls-title {
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .hands {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    .hand-button {
+      padding: 18px 10px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel2);
+      color: var(--text);
+      font: inherit;
+      font-size: clamp(1rem, 3vw, 1.25rem);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .hand-button:hover:not(:disabled) {
+      border-color: var(--accent);
+    }
+
+    .hand-button:disabled {
+      opacity: .4;
+      cursor: wait;
     }
 
     .stage {
@@ -56,8 +125,8 @@
       overflow: hidden;
     }
 
-    #before {
-      padding: 36px 20px;
+    #idlePanel {
+      padding: 34px 22px;
     }
 
     #playerWrap {
@@ -70,39 +139,45 @@
       aspect-ratio: 16 / 9;
     }
 
-    /* 再生リスト取得専用。画面外に隠す */
-    #playlistLoaderWrap {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      opacity: 0;
-      pointer-events: none;
-      left: -9999px;
-      top: -9999px;
+    #status {
+      margin: 0;
+      color: var(--muted);
     }
 
-    .main-button {
-      min-width: min(360px, 80vw);
-      padding: 20px 34px;
-      border: 0;
-      border-radius: 999px;
-      background: var(--accent);
-      color: var(--accent-text);
-      font: inherit;
-      font-size: clamp(1.2rem, 4vw, 1.65rem);
-      font-weight: 700;
-      cursor: pointer;
+    .result {
+      display: none;
+      margin-top: 18px;
+      padding: 22px 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
     }
 
-    .main-button:disabled {
-      opacity: .45;
-      cursor: wait;
+    .result-main {
+      font-size: clamp(2rem, 8vw, 4rem);
+      font-weight: 800;
+      letter-spacing: .04em;
     }
 
-    .secondary {
-      margin-top: 22px;
-      padding: 12px 22px;
+    .result-main.lucky {
+      color: var(--lucky);
+    }
+
+    .result-detail {
+      margin-top: 8px;
+      color: var(--muted);
+    }
+
+    .footer {
+      margin-top: 18px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .small-button {
+      padding: 9px 14px;
       border: 1px solid var(--line);
       border-radius: 999px;
       background: transparent;
@@ -111,44 +186,93 @@
       cursor: pointer;
     }
 
-    #againButton {
-      display: none;
-    }
-
-    #status {
-      min-height: 1.6em;
-      margin: 18px 0 0;
-      color: var(--muted);
-      font-size: .95rem;
-    }
-
-    .small {
-      margin-top: 28px;
+    .load-detail {
+      margin-top: 10px;
       color: var(--muted);
       font-size: .8rem;
     }
 
-    @media (max-width: 600px) {
-      main { padding-top: 32px; }
-      .stage { min-height: 240px; }
+    /* YouTube IFrame Player APIの最小表示サイズ要件を満たしたまま画面外へ退避 */
+    .playlist-loader {
+      position: absolute;
+      left: -10000px;
+      top: -10000px;
+      width: 200px;
+      height: 200px;
+      opacity: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    @media (max-width: 650px) {
+      main {
+        padding-top: 28px;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .stat:last-child {
+        grid-column: 1 / -1;
+      }
+
+      .stage {
+        min-height: 240px;
+      }
+
+      .hands {
+        gap: 7px;
+      }
+
+      .hand-button {
+        padding: 15px 5px;
+      }
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786718002811&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000004c748206bbe24f76b20d3c56%26fn%3Dindex%25283%2529.html%26cd%3Dattachment%26ts%3D496311%26p%3Dfs%26cid%3D1%26sig%3D078d88a3554cc300727d6ec4150a5ff805bc3881a28b769548b459bfcee77d1f%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786718002811&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786746795259&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000002450820b8ac3813c656c942e%26fn%3Dindex%25284%2529.html%26cd%3Dattachment%26ts%3D496319%26p%3Dfs%26cid%3D1%26sig%3D3a87f1e54ffc8c41066f657cc3e093df6721d93dd13f79b91971be009b9f6a38%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786746795259&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 
 <body>
   <main>
     <h1>剣持じゃんけん</h1>
-    <p class="subtitle">何が出るかは、押してからのお楽しみ。</p>
+    <p class="subtitle">あなたの手を選んでください。</p>
+
+    <section class="stats" aria-label="戦績">
+      <div class="stat">
+        <span class="stat-label">WIN</span>
+        <span id="winStat" class="stat-value">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">LOSE</span>
+        <span id="loseStat" class="stat-value">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">DRAW</span>
+        <span id="drawStat" class="stat-value">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">LUCKY</span>
+        <span id="luckyStat" class="stat-value">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">遭遇</span>
+        <span id="seenStat" class="stat-value">0 / 0</span>
+      </div>
+    </section>
+
+    <section class="controls">
+      <div class="controls-title">あなたの手</div>
+      <div class="hands">
+        <button class="hand-button" data-hand="G" type="button" disabled>✊ グー</button>
+        <button class="hand-button" data-hand="C" type="button" disabled>✌ チョキ</button>
+        <button class="hand-button" data-hand="P" type="button" disabled>✋ パー</button>
+      </div>
+    </section>
 
     <section class="stage">
-      <div id="before">
-        <button id="jankenButton" class="main-button" type="button" disabled>
-          読み込み中…
-        </button>
-
-        <p id="status" aria-live="polite">
-          YouTubeプレイリストを準備しています。
-        </p>
+      <div id="idlePanel">
+        <p id="status" aria-live="polite">4つの再生リストを読み込んでいます…</p>
+        <div id="loadDetail" class="load-detail"></div>
       </div>
 
       <div id="playerWrap">
@@ -156,55 +280,137 @@
       </div>
     </section>
 
-    <button id="againButton" class="secondary" type="button">
-      もう一回
-    </button>
+    <section id="resultPanel" class="result" aria-live="polite">
+      <div id="resultMain" class="result-main"></div>
+      <div id="resultDetail" class="result-detail"></div>
+    </section>
 
-    <p class="small">テスト版</p>
+    <div class="footer">
+      <button id="resetButton" class="small-button" type="button">記録をリセット</button>
+    </div>
   </main>
 
-  <!-- 再生リスト取得専用の非表示プレイヤー -->
-  <div id="playlistLoaderWrap" aria-hidden="true">
-    <div id="playlistLoader"></div>
-  </div>
+  <!-- 再生リスト取得専用。表示用プレイヤーとは完全に分離。 -->
+  <div class="playlist-loader"><div id="loaderG"></div></div>
+  <div class="playlist-loader"><div id="loaderC"></div></div>
+  <div class="playlist-loader"><div id="loaderP"></div></div>
+  <div class="playlist-loader"><div id="loaderL"></div></div>
 
   <script>
-    const PLAYLIST_ID = "PLGQedG8B-hiE";
+    const PLAYLISTS = {
+      G: "PLDE7S7RlkaqQ",
+      C: "PLSEWArLmE528",
+      P: "PLLoF-mptrv8Q",
+      L: "PLNINXcEYzdDA"
+    };
 
-    let playlistLoader;
-    let displayPlayer;
+    const HAND_NAMES = {
+      G: "グー",
+      C: "チョキ",
+      P: "パー"
+    };
 
-    let videoIds = [];
-    let lastIndex = -1;
+    const STORAGE_KEY = "kenmochi-janken-test2-v1";
 
-    const jankenButton = document.getElementById("jankenButton");
-    const againButton = document.getElementById("againButton");
-    const before = document.getElementById("before");
+    let displayPlayer = null;
+    let displayReady = false;
+
+    const loaders = {};
+    const loadedLists = {
+      G: [],
+      C: [],
+      P: [],
+      L: []
+    };
+
+    let catalog = [];
+    let currentDraw = null;
+    let isPlaying = false;
+
+    let state = loadState();
+
+    const handButtons = [...document.querySelectorAll(".hand-button")];
+    const statusEl = document.getElementById("status");
+    const loadDetailEl = document.getElementById("loadDetail");
+    const idlePanel = document.getElementById("idlePanel");
     const playerWrap = document.getElementById("playerWrap");
-    const status = document.getElementById("status");
+    const resultPanel = document.getElementById("resultPanel");
+    const resultMain = document.getElementById("resultMain");
+    const resultDetail = document.getElementById("resultDetail");
 
-    // YouTube IFrame Player API
-    const tag = document.createElement("script");
-    tag.src = "https://www.youtube.com/iframe_api";
-    document.head.appendChild(tag);
+    const winStat = document.getElementById("winStat");
+    const loseStat = document.getElementById("loseStat");
+    const drawStat = document.getElementById("drawStat");
+    const luckyStat = document.getElementById("luckyStat");
+    const seenStat = document.getElementById("seenStat");
+    const resetButton = document.getElementById("resetButton");
+
+    function defaultState() {
+      return {
+        win: 0,
+        lose: 0,
+        draw: 0,
+        lucky: 0,
+        seenIds: []
+      };
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return defaultState();
+
+        const parsed = JSON.parse(raw);
+        return {
+          win: Number(parsed.win) || 0,
+          lose: Number(parsed.lose) || 0,
+          draw: Number(parsed.draw) || 0,
+          lucky: Number(parsed.lucky) || 0,
+          seenIds: Array.isArray(parsed.seenIds) ? parsed.seenIds : []
+        };
+      } catch (e) {
+        return defaultState();
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn("localStorage save failed:", e);
+      }
+    }
+
+    function updateStats() {
+      winStat.textContent = state.win;
+      loseStat.textContent = state.lose;
+      drawStat.textContent = state.draw;
+      luckyStat.textContent = state.lucky;
+      seenStat.textContent = `${state.seenIds.length} / ${catalog.length}`;
+    }
+
+    function updateLoadDetail() {
+      loadDetailEl.textContent =
+        `G ${loadedLists.G.length} / C ${loadedLists.C.length} / ` +
+        `P ${loadedLists.P.length} / L ${loadedLists.L.length}`;
+    }
+
+    function setHandsEnabled(enabled) {
+      handButtons.forEach(button => {
+        button.disabled = !enabled;
+      });
+    }
+
+    const apiScript = document.createElement("script");
+    apiScript.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(apiScript);
 
     window.onYouTubeIframeAPIReady = function () {
-      // 1) 再生リスト取得専用プレイヤー
-      playlistLoader = new YT.Player("playlistLoader", {
-        width: "1",
-        height: "1",
-        playerVars: {
-          autoplay: 0,
-          controls: 0,
-          playsinline: 1
-        },
-        events: {
-          onReady: onPlaylistLoaderReady,
-          onError: onPlaylistLoaderError
-        }
-      });
+      createPlaylistLoader("G", "loaderG");
+      createPlaylistLoader("C", "loaderC");
+      createPlaylistLoader("P", "loaderP");
+      createPlaylistLoader("L", "loaderL");
 
-      // 2) 実際の表示・再生専用プレイヤー
       displayPlayer = new YT.Player("displayPlayer", {
         width: "100%",
         height: "100%",
@@ -215,117 +421,248 @@
           modestbranding: 1
         },
         events: {
-          onReady: onDisplayPlayerReady,
-          onStateChange: onDisplayPlayerStateChange,
-          onError: onDisplayPlayerError
+          onReady: () => {
+            displayReady = true;
+            tryFinishLoading();
+          },
+          onStateChange: onDisplayStateChange,
+          onError: onDisplayError
         }
       });
     };
 
-    function onPlaylistLoaderReady() {
-      // このプレイヤーでは再生しない。
-      // 再生リストをcueしてID一覧だけ取得する。
-      playlistLoader.cuePlaylist({
-        listType: "playlist",
-        list: PLAYLIST_ID,
-        index: 0
+    function createPlaylistLoader(type, elementId) {
+      loaders[type] = new YT.Player(elementId, {
+        width: "200",
+        height: "200",
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          playsinline: 1
+        },
+        events: {
+          onReady: () => {
+            loaders[type].cuePlaylist({
+              listType: "playlist",
+              list: PLAYLISTS[type],
+              index: 0
+            });
+            waitForPlaylist(type);
+          },
+          onError: event => {
+            console.error(`Playlist ${type} error:`, event.data);
+            statusEl.textContent =
+              `${type}再生リストの読み込みでエラーが発生しました。`;
+          }
+        }
       });
-
-      waitForPlaylist();
     }
 
-    function onDisplayPlayerReady() {
-      // 表示用プレイヤーは空のまま待機。
-    }
-
-    function waitForPlaylist(attempt = 0) {
-      const list = playlistLoader && playlistLoader.getPlaylist
-        ? playlistLoader.getPlaylist()
-        : [];
+    function waitForPlaylist(type, attempt = 0) {
+      const player = loaders[type];
+      const list = player && player.getPlaylist ? player.getPlaylist() : [];
 
       if (Array.isArray(list) && list.length > 0) {
-        videoIds = [...list];
+        loadedLists[type] = [...list];
 
-        // 念のため取得後は非表示プレイヤーを停止。
         try {
-          playlistLoader.stopVideo();
+          player.stopVideo();
         } catch (e) {}
 
-        jankenButton.disabled = false;
-        jankenButton.textContent = "じゃんけんする";
-        status.textContent = `${videoIds.length}本の動画を読み込みました。`;
+        updateLoadDetail();
+        tryFinishLoading();
         return;
       }
 
-      if (attempt >= 40) {
-        jankenButton.disabled = true;
-        jankenButton.textContent = "読み込み失敗";
-        status.textContent =
-          "プレイリストを読み込めませんでした。公開設定・埋め込み設定・プレイリストIDを確認してください。";
+      if (attempt >= 50) {
+        statusEl.textContent =
+          `${type}再生リストを読み込めませんでした。公開設定・埋め込み設定を確認してください。`;
         return;
       }
 
-      setTimeout(() => waitForPlaylist(attempt + 1), 300);
+      setTimeout(() => waitForPlaylist(type, attempt + 1), 300);
     }
 
-    function chooseRandomIndex(length) {
-      if (length <= 1) return 0;
+    function tryFinishLoading() {
+      const allListsReady =
+        loadedLists.G.length > 0 &&
+        loadedLists.C.length > 0 &&
+        loadedLists.P.length > 0 &&
+        loadedLists.L.length > 0;
 
-      let index;
-      do {
-        index = Math.floor(Math.random() * length);
-      } while (index === lastIndex);
+      if (!allListsReady || !displayReady) return;
 
-      lastIndex = index;
-      return index;
+      catalog = [
+        ...loadedLists.G.map(videoId => ({ videoId, type: "G" })),
+        ...loadedLists.C.map(videoId => ({ videoId, type: "C" })),
+        ...loadedLists.P.map(videoId => ({ videoId, type: "P" })),
+        ...loadedLists.L.map(videoId => ({ videoId, type: "L" }))
+      ];
+
+      // 再生リストの中身が変わった場合、存在しない古いIDは遭遇履歴から除去。
+      const currentIds = new Set(catalog.map(item => item.videoId));
+      state.seenIds = state.seenIds.filter(id => currentIds.has(id));
+      saveState();
+
+      statusEl.textContent =
+        `${catalog.length}本を読み込みました。あなたの手を選んでください。`;
+
+      updateStats();
+      updateLoadDetail();
+      setHandsEnabled(true);
     }
 
-    function playRandomVideo() {
-      if (!displayPlayer || videoIds.length === 0) return;
+    function getAvailableItems() {
+      const seen = new Set(state.seenIds);
+      return catalog.filter(item => !seen.has(item.videoId));
+    }
 
-      const randomIndex = chooseRandomIndex(videoIds.length);
-      const videoId = videoIds[randomIndex];
+    function drawRandomItem() {
+      let available = getAvailableItems();
 
-      before.style.display = "none";
+      if (available.length === 0 && catalog.length > 0) {
+        // 全動画を見たら、次の抽選から新しい一周を開始。
+        state.seenIds = [];
+        saveState();
+        available = [...catalog];
+        statusEl.textContent = "一周完了。抽選履歴をリセットして新しい一周を開始します。";
+      }
+
+      if (available.length === 0) return null;
+
+      const index = Math.floor(Math.random() * available.length);
+      return available[index];
+    }
+
+    function judge(userHand, kenmochiHand) {
+      if (userHand === kenmochiHand) return "DRAW";
+
+      if (
+        (userHand === "G" && kenmochiHand === "C") ||
+        (userHand === "C" && kenmochiHand === "P") ||
+        (userHand === "P" && kenmochiHand === "G")
+      ) {
+        return "WIN";
+      }
+
+      return "LOSE";
+    }
+
+    function startRound(userHand) {
+      if (!displayReady || catalog.length === 0 || isPlaying) return;
+
+      const item = drawRandomItem();
+      if (!item) return;
+
+      currentDraw = {
+        userHand,
+        item
+      };
+
+      // 抽選された時点で「遭遇済み」とする。
+      state.seenIds.push(item.videoId);
+      saveState();
+      updateStats();
+
+      isPlaying = true;
+      setHandsEnabled(false);
+
+      resultPanel.style.display = "none";
+      resultMain.className = "result-main";
+      resultMain.textContent = "";
+      resultDetail.textContent = "";
+
+      idlePanel.style.display = "none";
       playerWrap.style.display = "block";
-      againButton.style.display = "inline-block";
 
-      status.textContent = "再生中です。";
-
-      // 表示プレイヤーにはプレイリストを一度も読み込ませない。
-      // 単体動画だけをロードして再生する。
       displayPlayer.loadVideoById({
-        videoId: videoId
+        videoId: item.videoId
       });
     }
 
-    function onDisplayPlayerStateChange(event) {
-      if (event.data === YT.PlayerState.ENDED) {
-        // 念のため明示的に停止。
-        // 表示用プレイヤーにはplaylist contextがないため、
-        // ここから次動画へ進むことはない。
-        try {
-          displayPlayer.stopVideo();
-        } catch (e) {}
+    function onDisplayStateChange(event) {
+      if (event.data !== YT.PlayerState.ENDED || !currentDraw) return;
 
-        status.textContent = "終了しました。「もう一回」で次を引けます。";
+      try {
+        displayPlayer.stopVideo();
+      } catch (e) {}
+
+      finishRound();
+    }
+
+    function finishRound() {
+      const { userHand, item } = currentDraw;
+
+      if (item.type === "L") {
+        state.lucky += 1;
+        resultMain.textContent = "LUCKY!";
+        resultMain.className = "result-main lucky";
+        resultDetail.textContent = "勝敗には加算されません。";
+      } else {
+        const result = judge(userHand, item.type);
+
+        if (result === "WIN") state.win += 1;
+        if (result === "LOSE") state.lose += 1;
+        if (result === "DRAW") state.draw += 1;
+
+        resultMain.textContent = result;
+        resultMain.className = "result-main";
+        resultDetail.textContent =
+          `あなた：${HAND_NAMES[userHand]}　／　剣持：${HAND_NAMES[item.type]}`;
       }
+
+      saveState();
+      updateStats();
+
+      resultPanel.style.display = "block";
+      statusEl.textContent = "次の手を選んでください。";
+
+      isPlaying = false;
+      currentDraw = null;
+      setHandsEnabled(true);
     }
 
-    function onPlaylistLoaderError(event) {
-      console.error("Playlist loader error:", event.data);
-      status.textContent =
-        "プレイリストの読み込みでエラーが発生しました。";
-    }
-
-    function onDisplayPlayerError(event) {
+    function onDisplayError(event) {
       console.error("Display player error:", event.data);
-      status.textContent =
-        "この動画は埋め込み再生できない可能性があります。「もう一回」をお試しください。";
+
+      statusEl.textContent =
+        "動画を埋め込み再生できませんでした。別の手を選んでもう一度お試しください。";
+
+      try {
+        displayPlayer.stopVideo();
+      } catch (e) {}
+
+      isPlaying = false;
+      currentDraw = null;
+      setHandsEnabled(true);
     }
 
-    jankenButton.addEventListener("click", playRandomVideo);
-    againButton.addEventListener("click", playRandomVideo);
+    handButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        startRound(button.dataset.hand);
+      });
+    });
+
+    resetButton.addEventListener("click", () => {
+      const ok = window.confirm(
+        "WIN / LOSE / DRAW / LUCKY と遭遇履歴をすべてリセットしますか？"
+      );
+
+      if (!ok) return;
+
+      state = defaultState();
+      saveState();
+      updateStats();
+
+      resultPanel.style.display = "none";
+      statusEl.textContent =
+        catalog.length > 0
+          ? "記録をリセットしました。あなたの手を選んでください。"
+          : "再生リストを読み込んでいます…";
+    });
+
+    updateStats();
+    updateLoadDetail();
   </script>
 </body>
 </html>

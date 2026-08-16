@@ -44,36 +44,92 @@
     }
 
     .subtitle {
-      margin: 0 0 28px;
+      margin: 0 0 14px;
       color: var(--muted);
     }
 
-    .stats {
+    .all-patterns-link {
+      margin: 0 0 28px;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    .all-patterns-link a {
+      color: var(--text);
+      text-underline-offset: 3px;
+    }
+
+    .all-patterns-link a:hover {
+      opacity: .8;
+    }
+
+    .summary {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 8px;
+      grid-template-columns: 1.6fr .9fr 1.5fr;
+      gap: 10px;
       margin-bottom: 18px;
     }
 
-    .stat {
-      padding: 11px 6px;
+    .summary-card {
+      padding: 13px 14px;
       border: 1px solid var(--line);
-      border-radius: 12px;
+      border-radius: 14px;
       background: var(--panel);
+      text-align: left;
     }
 
-    .stat-label {
-      display: block;
+    .summary-label {
       color: var(--muted);
       font-size: .72rem;
-      letter-spacing: .05em;
+      letter-spacing: .06em;
+      margin-bottom: 5px;
     }
 
-    .stat-value {
-      display: block;
-      margin-top: 2px;
-      font-size: 1.25rem;
+    .summary-main {
+      font-size: 1.05rem;
       font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .summary-sub {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    .lucky-inline {
+      color: var(--lucky);
+      white-space: nowrap;
+    }
+
+    .encounter-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel2);
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: var(--accent);
+      transition: width .25s ease;
+    }
+
+    .progress-text {
+      color: var(--muted);
+      font-size: .76rem;
+      white-space: nowrap;
     }
 
     .controls {
@@ -151,21 +207,113 @@
       border: 1px solid var(--line);
       border-radius: 16px;
       background: var(--panel);
+      transition: border-color .2s ease, background .2s ease;
+    }
+
+    .result.result-win {
+      border-color: #5f8f6c;
+    }
+
+    .result.result-lose {
+      border-color: #8e5f66;
+    }
+
+    .result.result-draw {
+      border-color: #697487;
+    }
+
+    .result.result-lucky {
+      border-color: #9c8430;
     }
 
     .result-main {
       font-size: clamp(2rem, 8vw, 4rem);
       font-weight: 800;
       letter-spacing: .04em;
+      animation: result-pop .22s ease-out;
+    }
+
+    .result-main.win {
+      color: #9fd7ad;
+    }
+
+    .result-main.lose {
+      color: #dba5ad;
+    }
+
+    .result-main.draw {
+      color: #c6ccd8;
     }
 
     .result-main.lucky {
       color: var(--lucky);
+      animation: lucky-pop .55s ease-out;
+    }
+
+    .result.result-lucky {
+      animation: lucky-flash .75s ease-out;
+    }
+
+    @keyframes lucky-pop {
+      0% {
+        opacity: .4;
+        transform: scale(.82);
+      }
+      55% {
+        opacity: 1;
+        transform: scale(1.12);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes lucky-flash {
+      0% {
+        background: var(--panel);
+        border-color: #9c8430;
+      }
+      35% {
+        background: rgba(244, 211, 94, .16);
+        border-color: var(--lucky);
+      }
+      100% {
+        background: var(--panel);
+        border-color: #9c8430;
+      }
     }
 
     .result-detail {
       margin-top: 8px;
       color: var(--muted);
+    }
+
+    .share-button {
+      margin-top: 14px;
+      padding: 9px 15px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      font-size: .88rem;
+      cursor: pointer;
+    }
+
+    .share-button:hover {
+      border-color: var(--text);
+    }
+
+    @keyframes result-pop {
+      from {
+        opacity: .5;
+        transform: scale(.97);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
 
     .footer {
@@ -184,6 +332,21 @@
       color: var(--text);
       font: inherit;
       cursor: pointer;
+    }
+
+    .special-thanks {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: .72rem;
+    }
+
+    .special-thanks a {
+      color: var(--muted);
+      text-underline-offset: 2px;
+    }
+
+    .special-thanks a:hover {
+      color: var(--text);
     }
 
     .load-detail {
@@ -209,12 +372,34 @@
         padding-top: 28px;
       }
 
-      .stats {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+      .summary {
+        grid-template-columns: 1fr;
+        gap: 8px;
       }
 
-      .stat:last-child {
-        grid-column: 1 / -1;
+      .summary-card {
+        display: grid;
+        grid-template-columns: 72px 1fr;
+        align-items: center;
+        gap: 8px 12px;
+        padding: 10px 12px;
+      }
+
+      .summary-label {
+        margin: 0;
+      }
+
+      .summary-main {
+        font-size: 1rem;
+      }
+
+      .summary-sub {
+        grid-column: 2;
+        margin-top: -5px;
+      }
+
+      .summary-card:last-child {
+        display: block;
       }
 
       .stage {
@@ -230,33 +415,46 @@
       }
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786842321438&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_0000000076088209bd8e090be63ab608%26fn%3Dindex%25285%2529.html%26cd%3Dattachment%26ts%3D496345%26p%3Dfs%26cid%3D1%26sig%3D618fa34afa4f472db3ca09d2cce5c385e080e55bbcddb97b0c932d24a64ac6bb%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786842321438&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786847726501&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000fe3481f8bbe66bb584261f64%26fn%3Dindex_lucky_sharefix.html%26cd%3Dattachment%26ts%3D496346%26p%3Dfs%26cid%3D1%26sig%3D851365f47ee8e5595013613a085346590a29951b18bfcc516432a96d400fdf2d%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786847726501&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 
 <body>
   <main>
     <h1>剣持じゃんけん</h1>
-    <p class="subtitle">あなたの手を選んでください。</p>
+    <p class="subtitle">※全パターン遭遇しても何も起こりません</p>
 
-    <section class="stats" aria-label="戦績">
-      <div class="stat">
-        <span class="stat-label">WIN</span>
-        <span id="winStat" class="stat-value">0</span>
+    <p class="all-patterns-link">
+      じゃんけんせずに全パターン見たい方はこちら→
+      <a href="https://youtu.be/IEgMYg5UUc8" target="_blank" rel="noopener noreferrer">
+        全パターン動画
+      </a>
+    </p>
+
+    <section class="summary" aria-label="戦績と進捗">
+      <div class="summary-card">
+        <div class="summary-label">戦績</div>
+        <div class="summary-main">
+          <span id="winStat">0</span>勝
+          <span id="loseStat">0</span>敗
+          <span id="drawStat">0</span>分
+          <span class="lucky-inline">★<span id="luckyStat">0</span></span>
+        </div>
       </div>
-      <div class="stat">
-        <span class="stat-label">LOSE</span>
-        <span id="loseStat" class="stat-value">0</span>
+
+      <div class="summary-card">
+        <div class="summary-label">連勝</div>
+        <div class="summary-main"><span id="streakStat">0</span></div>
+        <div class="summary-sub">BEST <span id="bestStreakStat">0</span></div>
       </div>
-      <div class="stat">
-        <span class="stat-label">DRAW</span>
-        <span id="drawStat" class="stat-value">0</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">LUCKY</span>
-        <span id="luckyStat" class="stat-value">0</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">遭遇</span>
-        <span id="seenStat" class="stat-value">0 / 108</span>
+
+      <div class="summary-card">
+        <div class="summary-label">遭遇</div>
+        <div class="encounter-row">
+          <div class="summary-main"><span id="seenStat">0 / 108</span></div>
+          <div id="encounterProgressText" class="progress-text">0.0%</div>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div id="encounterBar" class="progress-bar"></div>
+        </div>
       </div>
     </section>
 
@@ -283,11 +481,21 @@
     <section id="resultPanel" class="result" aria-live="polite">
       <div id="resultMain" class="result-main"></div>
       <div id="resultDetail" class="result-detail"></div>
+      <button id="shareButton" class="share-button" type="button">
+        Xで結果をシェア（試験）
+      </button>
     </section>
 
     <div class="footer">
       <button id="resetButton" class="small-button" type="button">記録をリセット</button>
     </div>
+
+    <p class="special-thanks">
+      Special Thanks：
+      <a href="https://kenmochi-button-plus.pages.dev/" target="_blank" rel="noopener noreferrer">
+        剣持ボタン＋
+      </a>
+    </p>
   </main>
 
   <!-- 再生リスト取得専用。表示用プレイヤーとは完全に分離。 -->
@@ -329,6 +537,8 @@
     let catalog = [];
     let currentDraw = null;
     let isPlaying = false;
+    let completedAllPatternsThisRound = false;
+    let lastResultForShare = "";
 
     let state = loadState();
 
@@ -340,12 +550,17 @@
     const resultPanel = document.getElementById("resultPanel");
     const resultMain = document.getElementById("resultMain");
     const resultDetail = document.getElementById("resultDetail");
+    const shareButton = document.getElementById("shareButton");
 
     const winStat = document.getElementById("winStat");
     const loseStat = document.getElementById("loseStat");
     const drawStat = document.getElementById("drawStat");
     const luckyStat = document.getElementById("luckyStat");
+    const streakStat = document.getElementById("streakStat");
+    const bestStreakStat = document.getElementById("bestStreakStat");
     const seenStat = document.getElementById("seenStat");
+    const encounterBar = document.getElementById("encounterBar");
+    const encounterProgressText = document.getElementById("encounterProgressText");
     const resetButton = document.getElementById("resetButton");
 
     function defaultState() {
@@ -354,6 +569,8 @@
         lose: 0,
         draw: 0,
         lucky: 0,
+        streak: 0,
+        bestStreak: 0,
         seenIds: []
       };
     }
@@ -369,6 +586,8 @@
           lose: Number(parsed.lose) || 0,
           draw: Number(parsed.draw) || 0,
           lucky: Number(parsed.lucky) || 0,
+          streak: Number(parsed.streak) || 0,
+          bestStreak: Number(parsed.bestStreak) || 0,
           seenIds: Array.isArray(parsed.seenIds) ? parsed.seenIds : []
         };
       } catch (e) {
@@ -385,11 +604,20 @@
     }
 
     function updateStats() {
+      const total = catalog.length || 108;
+      const seen = state.seenIds.length;
+      const percent = total > 0 ? Math.min(100, (seen / total) * 100) : 0;
+
       winStat.textContent = state.win;
       loseStat.textContent = state.lose;
       drawStat.textContent = state.draw;
       luckyStat.textContent = state.lucky;
-      seenStat.textContent = `${state.seenIds.length} / ${catalog.length || EXPECTED_TOTAL}`;
+      streakStat.textContent = state.streak;
+      bestStreakStat.textContent = state.bestStreak;
+      seenStat.textContent = `${seen} / ${total}`;
+
+      encounterBar.style.width = `${percent}%`;
+      encounterProgressText.textContent = `${percent.toFixed(1)}%`;
     }
 
     function updateLoadDetail() {
@@ -576,6 +804,8 @@
     function startRound(userHand) {
       if (!displayReady || catalog.length === 0 || isPlaying) return;
 
+      completedAllPatternsThisRound = false;
+
       const item = drawRandomItem();
       if (!item) return;
 
@@ -586,6 +816,14 @@
 
       // 抽選された時点で「遭遇済み」とする。
       state.seenIds.push(item.videoId);
+
+      if (
+        catalog.length > 0 &&
+        state.seenIds.length === catalog.length
+      ) {
+        completedAllPatternsThisRound = true;
+      }
+
       saveState();
       updateStats();
 
@@ -593,6 +831,7 @@
       setHandsEnabled(false);
 
       resultPanel.style.display = "none";
+      resultPanel.className = "result";
       resultMain.className = "result-main";
       resultMain.textContent = "";
       resultDetail.textContent = "";
@@ -620,18 +859,35 @@
 
       if (item.type === "L") {
         state.lucky += 1;
+
+        lastResultForShare = "LUCKY!";
+        resultPanel.className = "result result-lucky";
         resultMain.textContent = "LUCKY!";
         resultMain.className = "result-main lucky";
         resultDetail.textContent = "勝敗には加算されません。";
       } else {
         const result = judge(userHand, item.type);
 
-        if (result === "WIN") state.win += 1;
-        if (result === "LOSE") state.lose += 1;
-        if (result === "DRAW") state.draw += 1;
+        if (result === "WIN") {
+          state.win += 1;
+          state.streak += 1;
+          state.bestStreak = Math.max(state.bestStreak, state.streak);
+        }
 
+        if (result === "LOSE") {
+          state.lose += 1;
+          state.streak = 0;
+        }
+
+        if (result === "DRAW") {
+          state.draw += 1;
+          // DRAWでは連勝数を維持
+        }
+
+        lastResultForShare = result;
+        resultPanel.className = `result result-${result.toLowerCase()}`;
         resultMain.textContent = result;
-        resultMain.className = "result-main";
+        resultMain.className = `result-main ${result.toLowerCase()}`;
         resultDetail.textContent =
           `あなた：${HAND_NAMES[userHand]}　／　剣持：${HAND_NAMES[item.type]}`;
       }
@@ -640,11 +896,37 @@
       updateStats();
 
       resultPanel.style.display = "block";
-      statusEl.textContent = "次の手を選んでください。";
+
+      if (completedAllPatternsThisRound) {
+        statusEl.textContent = "全パターン遭遇！時間は大切にしよう！";
+      } else {
+        statusEl.textContent = "次の手を選んでください。";
+      }
 
       isPlaying = false;
       currentDraw = null;
       setHandsEnabled(true);
+    }
+
+    function shareResultToX() {
+      if (!lastResultForShare) return;
+
+      const total = catalog.length || 108;
+      const text =
+        `剣持じゃんけん\n` +
+        `戦績 ${state.win}勝${state.lose}敗${state.draw}分 / LUCKY ${state.lucky}\n` +
+        `連勝 ${state.streak}（BEST ${state.bestStreak}） / 遭遇 ${state.seenIds.length}/${total}`;
+
+      const shareUrl =
+        "https://x.com/intent/tweet" +
+        `?text=${encodeURIComponent(text)}` +
+        `&url=${encodeURIComponent(window.location.href)}`;
+
+      window.open(
+        shareUrl,
+        "x-share",
+        "width=620,height=520,scrollbars=yes,resizable=yes"
+      );
     }
 
     function onDisplayError(event) {
@@ -668,9 +950,11 @@
       });
     });
 
+    shareButton.addEventListener("click", shareResultToX);
+
     resetButton.addEventListener("click", () => {
       const ok = window.confirm(
-        "WIN / LOSE / DRAW / LUCKY と遭遇履歴をすべてリセットしますか？"
+        "WIN / LOSE / DRAW / LUCKY / 連勝記録 と遭遇履歴をすべてリセットしますか？"
       );
 
       if (!ok) return;

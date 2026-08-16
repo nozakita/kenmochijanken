@@ -350,12 +350,7 @@
     #displayPlayer {
       width: 100%;
       aspect-ratio: 16 / 9;
-      opacity: 0;
-      transition: opacity .18s ease;
-    }
-
-    #displayPlayer.player-visible {
-      opacity: 1;
+      pointer-events: none;
     }
 
     #status {
@@ -633,7 +628,7 @@
 
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786874724548&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000002efc820db0c6023cc979db48%26fn%3Dindex_video_fade_test.html%26cd%3Dattachment%26ts%3D496354%26p%3Dfs%26cid%3D1%26sig%3D8699ab86b33a8c08d466d422992b4e591feb24fe9ac01ec61abe69c2f3d559ec%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786876518616&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000004c608206b650e190687e4a80%26fn%3Dindex_pointer_events_test.html%26cd%3Dattachment%26ts%3D496354%26p%3Dfs%26cid%3D1%26sig%3D123b4b93b320ed1ad8005e88d4948487b78d438fa7c3c4cff6c73c870b7b6e58%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786876518616&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 
 <body>
   <main>
@@ -821,7 +816,6 @@
     let catalog = [];
     let currentDraw = null;
     let isPlaying = false;
-    let revealTimer = null;
     let completedAllPatternsThisRound = false;
     let lastResultForShare = "";
 
@@ -1215,39 +1209,13 @@
       idlePanel.style.display = "none";
       playerWrap.style.display = "block";
 
-      if (revealTimer) {
-        clearTimeout(revealTimer);
-        revealTimer = null;
-      }
-      document.getElementById("displayPlayer").classList.remove("player-visible");
-
       displayPlayer.loadVideoById({
         videoId: item.videoId
       });
     }
 
     function onDisplayStateChange(event) {
-      if (!currentDraw) return;
-
-      if (event.data === YT.PlayerState.PLAYING) {
-        if (revealTimer) {
-          clearTimeout(revealTimer);
-        }
-
-        revealTimer = setTimeout(() => {
-          document.getElementById("displayPlayer").classList.add("player-visible");
-          revealTimer = null;
-        }, 500);
-
-        return;
-      }
-
-      if (event.data !== YT.PlayerState.ENDED) return;
-
-      if (revealTimer) {
-        clearTimeout(revealTimer);
-        revealTimer = null;
-      }
+      if (event.data !== YT.PlayerState.ENDED || !currentDraw) return;
 
       try {
         displayPlayer.stopVideo();
@@ -1366,11 +1334,6 @@
 
       statusEl.textContent =
         "動画を埋め込み再生できませんでした。別の手を選んでもう一度お試しください。";
-
-      if (revealTimer) {
-        clearTimeout(revealTimer);
-        revealTimer = null;
-      }
 
       try {
         displayPlayer.stopVideo();

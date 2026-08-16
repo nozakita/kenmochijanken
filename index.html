@@ -230,7 +230,7 @@
       }
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786746795259&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000002450820b8ac3813c656c942e%26fn%3Dindex%25284%2529.html%26cd%3Dattachment%26ts%3D496319%26p%3Dfs%26cid%3D1%26sig%3D3a87f1e54ffc8c41066f657cc3e093df6721d93dd13f79b91971be009b9f6a38%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786746795259&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786842321438&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_0000000076088209bd8e090be63ab608%26fn%3Dindex%25285%2529.html%26cd%3Dattachment%26ts%3D496345%26p%3Dfs%26cid%3D1%26sig%3D618fa34afa4f472db3ca09d2cce5c385e080e55bbcddb97b0c932d24a64ac6bb%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786842321438&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 
 <body>
   <main>
@@ -256,7 +256,7 @@
       </div>
       <div class="stat">
         <span class="stat-label">遭遇</span>
-        <span id="seenStat" class="stat-value">0 / 0</span>
+        <span id="seenStat" class="stat-value">0 / 108</span>
       </div>
     </section>
 
@@ -271,7 +271,7 @@
 
     <section class="stage">
       <div id="idlePanel">
-        <p id="status" aria-live="polite">4つの再生リストを読み込んでいます…</p>
+        <p id="status" aria-live="polite">108本の動画を読み込んでいます…</p>
         <div id="loadDetail" class="load-detail"></div>
       </div>
 
@@ -304,13 +304,16 @@
       L: "PLNINXcEYzdDA"
     };
 
+    const EXPECTED_COUNTS = { G: 33, C: 33, P: 33, L: 9 };
+    const EXPECTED_TOTAL = 108;
+
     const HAND_NAMES = {
       G: "グー",
       C: "チョキ",
       P: "パー"
     };
 
-    const STORAGE_KEY = "kenmochi-janken-test2-v1";
+    const STORAGE_KEY = "kenmochi-janken-v1";
 
     let displayPlayer = null;
     let displayReady = false;
@@ -386,13 +389,15 @@
       loseStat.textContent = state.lose;
       drawStat.textContent = state.draw;
       luckyStat.textContent = state.lucky;
-      seenStat.textContent = `${state.seenIds.length} / ${catalog.length}`;
+      seenStat.textContent = `${state.seenIds.length} / ${catalog.length || EXPECTED_TOTAL}`;
     }
 
     function updateLoadDetail() {
       loadDetailEl.textContent =
-        `G ${loadedLists.G.length} / C ${loadedLists.C.length} / ` +
-        `P ${loadedLists.P.length} / L ${loadedLists.L.length}`;
+        `G ${loadedLists.G.length}/${EXPECTED_COUNTS.G} / ` +
+        `C ${loadedLists.C.length}/${EXPECTED_COUNTS.C} / ` +
+        `P ${loadedLists.P.length}/${EXPECTED_COUNTS.P} / ` +
+        `L ${loadedLists.L.length}/${EXPECTED_COUNTS.L}`;
     }
 
     function setHandsEnabled(enabled) {
@@ -499,17 +504,37 @@
         ...loadedLists.L.map(videoId => ({ videoId, type: "L" }))
       ];
 
-      // 再生リストの中身が変わった場合、存在しない古いIDは遭遇履歴から除去。
       const currentIds = new Set(catalog.map(item => item.videoId));
-      state.seenIds = state.seenIds.filter(id => currentIds.has(id));
+      state.seenIds = [...new Set(state.seenIds)].filter(id => currentIds.has(id));
       saveState();
 
-      statusEl.textContent =
-        `${catalog.length}本を読み込みました。あなたの手を選んでください。`;
+      const countsCorrect =
+        loadedLists.G.length === EXPECTED_COUNTS.G &&
+        loadedLists.C.length === EXPECTED_COUNTS.C &&
+        loadedLists.P.length === EXPECTED_COUNTS.P &&
+        loadedLists.L.length === EXPECTED_COUNTS.L;
+
+      const noDuplicates = currentIds.size === catalog.length;
+      const totalCorrect = catalog.length === EXPECTED_TOTAL;
+
+      if (countsCorrect && totalCorrect && noDuplicates) {
+        statusEl.textContent =
+          "108本すべて読み込みました。あなたの手を選んでください。";
+      } else {
+        const notes = [];
+        if (!countsCorrect || !totalCorrect) {
+          notes.push(`本数 ${catalog.length}/108`);
+        }
+        if (!noDuplicates) {
+          notes.push(`重複 ${catalog.length - currentIds.size}件`);
+        }
+        statusEl.textContent =
+          `読み込み完了（要確認：${notes.join(" / ")}）。動作テストは可能です。`;
+      }
 
       updateStats();
       updateLoadDetail();
-      setHandsEnabled(true);
+      setHandsEnabled(catalog.length > 0);
     }
 
     function getAvailableItems() {
@@ -525,7 +550,7 @@
         state.seenIds = [];
         saveState();
         available = [...catalog];
-        statusEl.textContent = "一周完了。抽選履歴をリセットして新しい一周を開始します。";
+        statusEl.textContent = "108本すべて遭遇しました。新しい一周を開始します。";
       }
 
       if (available.length === 0) return null;
@@ -658,7 +683,7 @@
       statusEl.textContent =
         catalog.length > 0
           ? "記録をリセットしました。あなたの手を選んでください。"
-          : "再生リストを読み込んでいます…";
+          : "108本の動画を読み込んでいます…";
     });
 
     updateStats();

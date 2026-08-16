@@ -236,6 +236,60 @@
       white-space: nowrap;
     }
 
+    .strategy-panel {
+      margin: 0 0 18px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+      text-align: left;
+    }
+
+    .strategy-title {
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: .78rem;
+      letter-spacing: .05em;
+    }
+
+    .remaining-hands {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      margin-bottom: 10px;
+      font-size: .9rem;
+    }
+
+    .remaining-hands strong {
+      color: var(--text);
+    }
+
+    .win-rate-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .win-rate-item {
+      padding: 9px 8px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel2);
+      text-align: center;
+    }
+
+    .win-rate-hand {
+      display: block;
+      color: var(--muted);
+      font-size: .75rem;
+      margin-bottom: 2px;
+    }
+
+    .win-rate-value {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
     .controls {
       margin: 18px 0;
     }
@@ -594,9 +648,30 @@
       .hand-button {
         padding: 15px 5px;
       }
+
+      .strategy-panel {
+        padding: 12px;
+      }
+
+      .remaining-hands {
+        gap: 6px 12px;
+        font-size: .82rem;
+      }
+
+      .win-rate-item {
+        padding: 8px 4px;
+      }
+
+      .win-rate-hand {
+        font-size: .7rem;
+      }
+
+      .win-rate-value {
+        font-size: .92rem;
+      }
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786860325470&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000c2d882069ae88ade671384e4%26fn%3Dindex_kenmochi_score_help_simple.html%26cd%3Dattachment%26ts%3D496351%26p%3Dfs%26cid%3D1%26sig%3D3880bdb6fd0af91bd671fd9a4c8523b5d22b81573a519569fa8ca437e0e3f7d6%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786860325470&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786865723844&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_0000000025bc8206b251fc8f730c20f5%26fn%3Dindex_kenmochi_score_108hint.html%26cd%3Dattachment%26ts%3D496351%26p%3Dfs%26cid%3D1%26sig%3Dc63223509a85ef957d2bcc13c81a1f72ac5058bcfd36422f4338e2386d335c06%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786865723844&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 
 <body>
   <main>
@@ -629,7 +704,7 @@
 
       <div class="summary-card">
         <div class="summary-label">剣持スコア</div>
-        <div class="summary-main"><span id="streakStat">0</span></div>
+        <div class="summary-main"><span id="streakStat">0</span>/108</div>
         <div class="summary-sub">
           BEST <span id="bestStreakStat">0</span>
         </div>
@@ -643,6 +718,32 @@
         </div>
         <div class="progress-track" aria-hidden="true">
           <div id="encounterBar" class="progress-bar"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="strategy-panel" aria-label="残りパターンと次の勝率">
+      <div class="strategy-title">残りパターン / 次のWIN確率</div>
+
+      <div class="remaining-hands">
+        <span>✊ グー <strong id="remainingG">33</strong></span>
+        <span>✌ チョキ <strong id="remainingC">33</strong></span>
+        <span>✋ パー <strong id="remainingP">33</strong></span>
+        <span>★ LUCKY <strong id="remainingL">9</strong></span>
+      </div>
+
+      <div class="win-rate-row">
+        <div class="win-rate-item">
+          <span class="win-rate-hand">✊ グー</span>
+          <span id="winRateG" class="win-rate-value">30.6%</span>
+        </div>
+        <div class="win-rate-item">
+          <span class="win-rate-hand">✌ チョキ</span>
+          <span id="winRateC" class="win-rate-value">30.6%</span>
+        </div>
+        <div class="win-rate-item">
+          <span class="win-rate-hand">✋ パー</span>
+          <span id="winRateP" class="win-rate-value">30.6%</span>
         </div>
       </div>
     </section>
@@ -721,7 +822,7 @@
       <h2 id="helpTitle">剣持じゃんけん ルール</h2>
       <ul>
         <li>手を選ぶと、全108パターンからランダムに1本再生。1周するまで同じ動画は出ません。</li>
-        <li><strong>WIN +3 / DRAW +1 / LUCKY +2</strong> で剣持スコアが増えます。</li>
+        <li><strong>WIN +4 / DRAW +1 / LUCKY +2</strong> で剣持スコアが増えます。</li>
         <li><strong>LOSE</strong> はスコアお守りを1個自動使用して <strong>+1</strong>。お守り0ならスコアは0に戻ります。</li>
         <li>スコアお守りは最大3個。<strong>LUCKYで2個補充</strong>します。</li>
         <li>LUCKYは勝・敗・分とは別に記録されます。</li>
@@ -798,6 +899,15 @@
     const encounterBar = document.getElementById("encounterBar");
     const encounterProgressText = document.getElementById("encounterProgressText");
     const resetButton = document.getElementById("resetButton");
+
+    const remainingG = document.getElementById("remainingG");
+    const remainingC = document.getElementById("remainingC");
+    const remainingP = document.getElementById("remainingP");
+    const remainingL = document.getElementById("remainingL");
+    const winRateG = document.getElementById("winRateG");
+    const winRateC = document.getElementById("winRateC");
+    const winRateP = document.getElementById("winRateP");
+
     const helpButton = document.getElementById("helpButton");
     const helpModal = document.getElementById("helpModal");
     const helpCloseButton = document.getElementById("helpCloseButton");
@@ -853,6 +963,45 @@
       }
     }
 
+    function updateStrategyInfo() {
+      const seen = new Set(state.seenIds);
+      const remainingItems = catalog.length > 0
+        ? catalog.filter(item => !seen.has(item.videoId))
+        : [];
+
+      let counts;
+
+      if (catalog.length > 0) {
+        counts = { G: 0, C: 0, P: 0, L: 0 };
+        remainingItems.forEach(item => {
+          if (counts[item.type] != null) {
+            counts[item.type] += 1;
+          }
+        });
+      } else {
+        counts = { G: 33, C: 33, P: 33, L: 9 };
+      }
+
+      const totalRemaining =
+        counts.G + counts.C + counts.P + counts.L;
+
+      remainingG.textContent = counts.G;
+      remainingC.textContent = counts.C;
+      remainingP.textContent = counts.P;
+      remainingL.textContent = counts.L;
+
+      const percent = value =>
+        totalRemaining > 0
+          ? `${((value / totalRemaining) * 100).toFixed(1)}%`
+          : "—";
+
+      // 次の抽選でWINになる確率。
+      // グーはチョキに、チョキはパーに、パーはグーに勝つ。
+      winRateG.textContent = percent(counts.C);
+      winRateC.textContent = percent(counts.P);
+      winRateP.textContent = percent(counts.G);
+    }
+
     function updateStats() {
       const total = catalog.length || 108;
       const seen = state.seenIds.length;
@@ -869,6 +1018,7 @@
 
       encounterBar.style.width = `${percent}%`;
       encounterProgressText.textContent = `${percent.toFixed(1)}%`;
+      updateStrategyInfo();
       updateRewardDisplay();
     }
 
@@ -1152,7 +1302,8 @@
           addKenmochiScore();
           addKenmochiScore();
           addKenmochiScore();
-          charmUsedMessage.textContent = "剣持スコア +3";
+          addKenmochiScore();
+          charmUsedMessage.textContent = "剣持スコア +4";
         }
 
         if (result === "DRAW") {

@@ -487,7 +487,7 @@
       }
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786851321666&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000569c8206aba495e6bdd0700a%26fn%3Dindex_share_clean.html%26cd%3Dattachment%26ts%3D496348%26p%3Dfs%26cid%3D1%26sig%3D464f00e31308efed09157db9d761bc9de7a56830461d7ec54091e2c7b5a7dcd5%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786851321666&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786851321666&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000c71482308ff17b3f0bff939a%26fn%3Dindex_hide_ready_message.html%26cd%3Dattachment%26ts%3D496348%26p%3Dfs%26cid%3D1%26sig%3D738f671458c3741bc5b3dcf5b684fadba383789dcc1a6208ebaf1aa6af2d75ea%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786851321666&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 
 <body>
   <main>
@@ -857,8 +857,8 @@
       const totalCorrect = catalog.length === EXPECTED_TOTAL;
 
       if (countsCorrect && totalCorrect && noDuplicates) {
-        statusEl.textContent =
-          "108本すべて読み込みました。あなたの手を選んでください。";
+        // 正常に108本読み込めた場合、初期ロード完了メッセージと本数表示は非表示
+        statusEl.textContent = "";
       } else {
         const notes = [];
         if (!countsCorrect || !totalCorrect) {
@@ -873,6 +873,10 @@
 
       updateStats();
       updateLoadDetail();
+
+      if (countsCorrect && totalCorrect && noDuplicates) {
+        loadDetailEl.textContent = "";
+      }
       setHandsEnabled(catalog.length > 0);
     }
 

@@ -362,6 +362,33 @@
       border-color: var(--text);
     }
 
+    .reward-message {
+      margin-top: 14px;
+      color: var(--lucky);
+      font-weight: 700;
+    }
+
+    .reward-button {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 10px 17px;
+      border: 1px solid var(--lucky);
+      border-radius: 999px;
+      background: rgba(244, 211, 94, .12);
+      color: var(--lucky);
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .reward-button:hover {
+      background: rgba(244, 211, 94, .18);
+    }
+
+    .reward-button[hidden] {
+      display: none;
+    }
+
     @keyframes result-pop {
       from {
         opacity: .5;
@@ -422,9 +449,7 @@
     }
 
     .load-detail {
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: .8rem;
+      display: none;
     }
 
     /* YouTube IFrame Player APIの最小表示サイズ要件を満たしたまま画面外へ退避 */
@@ -487,7 +512,7 @@
       }
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786851321666&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000c71482308ff17b3f0bff939a%26fn%3Dindex_hide_ready_message.html%26cd%3Dattachment%26ts%3D496348%26p%3Dfs%26cid%3D1%26sig%3D738f671458c3741bc5b3dcf5b684fadba383789dcc1a6208ebaf1aa6af2d75ea%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786851321666&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786851321666&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000007ec882069dba506597bc18a1%26fn%3Dindex_reward108.html%26cd%3Dattachment%26ts%3D496348%26p%3Dfs%26cid%3D1%26sig%3Df9ed3ea50a804fce4788aa5f4d641a8965da351d9be220a4bbf826b4402fafc9%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786851321666&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 
 <body>
   <main>
@@ -564,6 +589,16 @@
       <div id="resultMain" class="result-main"></div>
       <div id="resultDetail" class="result-detail"></div>
       <div id="charmUsedMessage" class="charm-used"></div>
+      <div id="rewardMessage" class="reward-message" hidden>108連勝達成！</div>
+      <a
+        id="rewardButton"
+        class="reward-button"
+        href="https://youtu.be/X2qLzlWC5h8"
+        target="_blank"
+        rel="noopener noreferrer"
+        hidden
+      >ご褒美動画を見る</a>
+      <br id="rewardBreak" hidden>
       <button id="shareButton" class="share-button" type="button">
         Xで結果をシェア
       </button>
@@ -644,6 +679,9 @@
     const resultMain = document.getElementById("resultMain");
     const resultDetail = document.getElementById("resultDetail");
     const shareButton = document.getElementById("shareButton");
+    const rewardMessage = document.getElementById("rewardMessage");
+    const rewardButton = document.getElementById("rewardButton");
+    const rewardBreak = document.getElementById("rewardBreak");
 
     const winStat = document.getElementById("winStat");
     const loseStat = document.getElementById("loseStat");
@@ -669,6 +707,8 @@
         bestStreak: 0,
         charmCount: 2,
         charmEnabled: false,
+        rewardUnlocked: false,
+        rewardClaimed: false,
         seenIds: []
       };
     }
@@ -688,6 +728,9 @@
           bestStreak: Number(parsed.bestStreak) || 0,
           charmCount: Math.max(0, Math.min(2, Number(parsed.charmCount) || 0)),
           charmEnabled: Boolean(parsed.charmEnabled),
+          rewardUnlocked:
+            Boolean(parsed.rewardUnlocked) || (Number(parsed.bestStreak) || 0) >= 108,
+          rewardClaimed: Boolean(parsed.rewardClaimed),
           seenIds: Array.isArray(parsed.seenIds) ? parsed.seenIds : []
         };
       } catch (e) {
@@ -727,6 +770,7 @@
 
       encounterBar.style.width = `${percent}%`;
       encounterProgressText.textContent = `${percent.toFixed(1)}%`;
+      updateRewardDisplay();
     }
 
     function updateLoadDetail() {
@@ -743,6 +787,13 @@
       });
 
       charmToggle.disabled = !enabled || state.charmCount <= 0;
+    }
+
+    function updateRewardDisplay() {
+      const showReward = state.rewardUnlocked && !state.rewardClaimed;
+      rewardMessage.hidden = !showReward;
+      rewardButton.hidden = !showReward;
+      rewardBreak.hidden = !showReward;
     }
 
     const apiScript = document.createElement("script");
@@ -857,8 +908,8 @@
       const totalCorrect = catalog.length === EXPECTED_TOTAL;
 
       if (countsCorrect && totalCorrect && noDuplicates) {
-        // 正常に108本読み込めた場合、初期ロード完了メッセージと本数表示は非表示
-        statusEl.textContent = "";
+        statusEl.textContent =
+          "108本すべて読み込みました。あなたの手を選んでください。";
       } else {
         const notes = [];
         if (!countsCorrect || !totalCorrect) {
@@ -873,10 +924,6 @@
 
       updateStats();
       updateLoadDetail();
-
-      if (countsCorrect && totalCorrect && noDuplicates) {
-        loadDetailEl.textContent = "";
-      }
       setHandsEnabled(catalog.length > 0);
     }
 
@@ -998,6 +1045,10 @@
           state.win += 1;
           state.streak += 1;
           state.bestStreak = Math.max(state.bestStreak, state.streak);
+
+          if (state.streak >= 108) {
+            state.rewardUnlocked = true;
+          }
         }
 
         if (result === "LOSE") {
@@ -1090,6 +1141,12 @@
     });
 
     shareButton.addEventListener("click", shareResultToX);
+
+    rewardButton.addEventListener("click", () => {
+      state.rewardClaimed = true;
+      saveState();
+      setTimeout(updateRewardDisplay, 0);
+    });
 
     charmToggle.addEventListener("click", () => {
       if (state.charmCount <= 0 || isPlaying) return;

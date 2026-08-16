@@ -627,7 +627,7 @@
 
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786867523617&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000e980820c8b00d4b2998c72f9%26fn%3Dindex_hide_strategy_during_video.html%26cd%3Dattachment%26ts%3D496352%26p%3Dfs%26cid%3D1%26sig%3D7b785e355ae21e75958df330f023d31c87d5dc86704e83ba6518a6fe05638693%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786867523617&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786871126149&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_0000000026f0822fa75abe23a577a927%26fn%3Dindex_encounter_jp_labels.html%26cd%3Dattachment%26ts%3D496353%26p%3Dfs%26cid%3D1%26sig%3Da6794a1cd0bfa4034b78954c3d1701fe9b8fad857f3686fc85d510e1dfde61cc%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786871126149&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 
 <body>
   <main>
@@ -670,16 +670,15 @@
         <div class="summary-label">遭遇</div>
         <div class="encounter-row">
           <div class="summary-main"><span id="seenStat">0 / 108</span></div>
-          <div id="encounterProgressText" class="progress-text">0.0%</div>
         </div>
         <div class="progress-track" aria-hidden="true">
           <div id="encounterBar" class="progress-bar"></div>
         </div>
         <div id="remainingSummary" class="remaining-summary round-secret">
-          残り G <span id="remainingG">33</span> /
-          C <span id="remainingC">33</span> /
-          P <span id="remainingP">33</span> /
-          L <span id="remainingL">9</span>
+          残り グ <span id="remainingG">33</span> /
+          チ <span id="remainingC">33</span> /
+          パ <span id="remainingP">33</span> /
+          LUCKY <span id="remainingL">9</span>
         </div>
       </div>
     </section>
@@ -842,7 +841,6 @@
     const charmUsedMessage = document.getElementById("charmUsedMessage");
     const seenStat = document.getElementById("seenStat");
     const encounterBar = document.getElementById("encounterBar");
-    const encounterProgressText = document.getElementById("encounterProgressText");
     const resetButton = document.getElementById("resetButton");
 
     const remainingSummary = document.getElementById("remainingSummary");
@@ -964,7 +962,6 @@
       seenStat.textContent = `${seen} / ${total}`;
 
       encounterBar.style.width = `${percent}%`;
-      encounterProgressText.textContent = `${percent.toFixed(1)}%`;
       updateStrategyInfo();
       updateRewardDisplay();
     }

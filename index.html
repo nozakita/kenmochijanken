@@ -507,6 +507,10 @@
         min-height: 240px;
       }
 
+      #displayPlayer {
+        aspect-ratio: 4 / 3;
+      }
+
       .hands {
         gap: 7px;
       }
@@ -516,7 +520,7 @@
       }
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786854927088&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000458c82069d1c258090b3821c%26fn%3Dindex_note_fixed.html%26cd%3Dattachment%26ts%3D496348%26p%3Dfs%26cid%3D1%26sig%3Db898e38b413ad8c0f2079e9ca3be9481a866f16d660e6565b349b26b7b054252%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786854927088&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786854927088&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_0000000097b082098fb4f236325af6bf%26fn%3Dindex_mobile_charm_strategy.html%26cd%3Dattachment%26ts%3D496348%26p%3Dfs%26cid%3D1%26sig%3Def71b528cf72f962f1aabca4b26d26603e809e3399320f22249a47d73c34f54a%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786854927088&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 
 <body>
   <main>
@@ -813,9 +817,9 @@
         height: "100%",
         playerVars: {
           autoplay: 0,
+          controls: 0,
           playsinline: 1,
-          rel: 0,
-          modestbranding: 1
+          rel: 0
         },
         events: {
           onReady: () => {
@@ -975,7 +979,8 @@
 
       currentDraw = {
         userHand,
-        item
+        item,
+        useCharm: state.charmEnabled && state.charmCount > 0
       };
 
       // 抽選された時点で「遭遇済み」とする。
@@ -1020,7 +1025,14 @@
     }
 
     function finishRound() {
-      const { userHand, item } = currentDraw;
+      const { userHand, item, useCharm } = currentDraw;
+
+      // ONにして挑んだ連勝お守りは、結果に関係なくこの1戦で必ず消費。
+      if (useCharm && state.charmCount > 0) {
+        state.charmCount -= 1;
+        state.charmEnabled = false;
+        charmUsedMessage.textContent = "連勝お守りを使用しました。";
+      }
 
       if (item.type === "L") {
         state.lucky += 1;
@@ -1056,14 +1068,9 @@
         if (result === "LOSE") {
           state.lose += 1;
 
-          if (state.charmEnabled && state.charmCount > 0) {
-            state.charmCount -= 1;
+          if (useCharm) {
             charmUsedMessage.textContent =
-              "連勝お守りを使用！連勝記録を維持しました。";
-
-            if (state.charmCount <= 0) {
-              state.charmEnabled = false;
-            }
+              "連勝お守りが発動！連勝記録を維持しました。";
           } else {
             state.streak = 0;
           }

@@ -516,12 +516,12 @@
       }
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786851321666&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000e6f08209bee40f1d0a4c50dc%26fn%3Dindex_reward_preview.html%26cd%3Dattachment%26ts%3D496348%26p%3Dfs%26cid%3D1%26sig%3Dafebb08881b19af894b9ce455787aed185e1f18fe725b20cd56b32a5be305bfe%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786854927088&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000458c82069d1c258090b3821c%26fn%3Dindex_note_fixed.html%26cd%3Dattachment%26ts%3D496348%26p%3Dfs%26cid%3D1%26sig%3Db898e38b413ad8c0f2079e9ca3be9481a866f16d660e6565b349b26b7b054252%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786854927088&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 
 <body>
   <main>
     <h1>剣持じゃんけん</h1>
-    <p class="subtitle">※全パターン遭遇・連勝しても何も起こりません</p>
+    <p class="subtitle">※全パターン遭遇しても何も起こりません</p>
 
     <p class="all-patterns-link">
       じゃんけんせずに全パターン見たい方はこちら→
@@ -594,8 +594,8 @@
       <div id="resultDetail" class="result-detail"></div>
       <div id="charmUsedMessage" class="charm-used"></div>
 
-      <div id="rewardArea" class="reward-area">
-        <div class="reward-message">108連勝達成！ <span style="font-weight:400; opacity:.7;">（プレビュー）</span></div>
+      <div id="rewardArea" class="reward-area" hidden>
+        <div class="reward-message">108連勝達成！</div>
         <div class="reward-video">
           <iframe
             src="https://www.youtube.com/embed/X2qLzlWC5h8"
@@ -795,7 +795,7 @@
     }
 
     function updateRewardDisplay() {
-      rewardArea.hidden = false;
+      rewardArea.hidden = !state.rewardUnlocked;
     }
 
     const apiScript = document.createElement("script");

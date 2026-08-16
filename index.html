@@ -4,7 +4,26 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
+
   <title>剣持じゃんけん</title>
+  <meta name="description" content="剣持じゃんけん">
+
+  <!-- OGP -->
+  <meta property="og:title" content="剣持じゃんけん">
+  <meta property="og:description" content="剣持じゃんけん">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://nozakita.github.io/kenmochijanken/">
+  <meta property="og:image" content="https://nozakita.github.io/kenmochijanken/ogp.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="剣持じゃんけん">
+
+  <!-- X Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="剣持じゃんけん">
+  <meta name="twitter:description" content="剣持じゃんけん">
+  <meta name="twitter:image" content="https://nozakita.github.io/kenmochijanken/ogp.png">
+  <meta name="twitter:image:alt" content="剣持じゃんけん">
 
   <style>
     :root {
@@ -468,7 +487,7 @@
       }
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786851321666&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000893882069cb0ccab422390ec%26fn%3Dindex_contact_clean.html%26cd%3Dattachment%26ts%3D496347%26p%3Dfs%26cid%3D1%26sig%3D83c192da84f2c134048aa9ba6046a5c4c3bbacac66b515a2a4555e7ee4fd2acc%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786851321666&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786851321666&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000006e308206b7ddd5be0939f21d%26fn%3Dindex_ogp_preview.html%26cd%3Dattachment%26ts%3D496348%26p%3Dfs%26cid%3D1%26sig%3De219c1e08a7d817738adb31ce1cfda566896afa1ee54d496e042d6346e0d84c6%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script></head>
 
 <body>
   <main>
@@ -522,7 +541,7 @@
       </div>
 
       <div class="charm-control">
-        <span>お守り</span>
+        <span>連勝お守り</span>
         <button id="charmToggle" class="charm-toggle" type="button" disabled>
           OFF
         </button>
@@ -546,7 +565,7 @@
       <div id="resultDetail" class="result-detail"></div>
       <div id="charmUsedMessage" class="charm-used"></div>
       <button id="shareButton" class="share-button" type="button">
-        Xで結果をシェア（試験）
+        Xで結果をシェア
       </button>
     </section>
 
@@ -648,7 +667,7 @@
         lucky: 0,
         streak: 0,
         bestStreak: 0,
-        charmCount: 0,
+        charmCount: 2,
         charmEnabled: false,
         seenIds: []
       };
@@ -963,10 +982,10 @@
 
         if (beforeCharm < 2) {
           resultDetail.textContent =
-            `お守りを1個獲得！ 所持 ${state.charmCount}/2`;
+            `連勝お守りを1個獲得！ 所持 ${state.charmCount}/2`;
         } else {
           resultDetail.textContent =
-            "お守りは満タンです。勝敗には加算されません。";
+            "連勝お守りは満タンです。勝敗には加算されません。";
         }
       } else {
         const result = judge(userHand, item.type);
@@ -983,7 +1002,7 @@
           if (state.charmEnabled && state.charmCount > 0) {
             state.charmCount -= 1;
             charmUsedMessage.textContent =
-              "お守りを使用！連勝記録を維持しました。";
+              "連勝お守りを使用！連勝記録を維持しました。";
 
             if (state.charmCount <= 0) {
               state.charmEnabled = false;
@@ -1076,7 +1095,7 @@
 
     resetButton.addEventListener("click", () => {
       const ok = window.confirm(
-        "WIN / LOSE / DRAW / LUCKY / 連勝記録 / お守り と遭遇履歴をすべてリセットしますか？"
+        "WIN / LOSE / DRAW / LUCKY / 連勝記録 / 連勝お守り と遭遇履歴をすべてリセットしますか？"
       );
 
       if (!ok) return;

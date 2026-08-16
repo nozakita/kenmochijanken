@@ -230,6 +230,12 @@
       transition: width .25s ease;
     }
 
+    .progress-text {
+      color: var(--muted);
+      font-size: .76rem;
+      white-space: nowrap;
+    }
+
     .remaining-summary {
       margin-top: 7px;
       color: var(--muted);
@@ -296,6 +302,11 @@
       color: var(--text);
     }
 
+    .score-rule {
+      color: var(--muted);
+      font-size: .76rem;
+    }
+
     .hand-button {
       padding: 18px 10px;
       border: 1px solid var(--line);
@@ -333,12 +344,23 @@
 
     #playerWrap {
       display: none;
+      position: relative;
       width: 100%;
     }
 
     #displayPlayer {
       width: 100%;
       aspect-ratio: 16 / 9;
+    }
+
+    .player-shield {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      background: transparent;
+      cursor: default;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     #status {
@@ -370,7 +392,6 @@
 
     .result.result-lucky {
       border-color: #9c8430;
-      animation: lucky-flash .75s ease-out;
     }
 
     .result-main {
@@ -395,6 +416,10 @@
     .result-main.lucky {
       color: var(--lucky);
       animation: lucky-pop .55s ease-out;
+    }
+
+    .result.result-lucky {
+      animation: lucky-flash .75s ease-out;
     }
 
     @keyframes lucky-pop {
@@ -544,6 +569,10 @@
       color: var(--text);
     }
 
+    .load-detail {
+      display: none;
+    }
+
     /* YouTube IFrame Player APIの最小表示サイズ要件を満たしたまま画面外へ退避 */
     .playlist-loader {
       position: absolute;
@@ -609,7 +638,7 @@
 
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786876518616&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_0000000088d88207a01b060210ea863c%26fn%3Dindex_complete_v4_clean.html%26cd%3Dattachment%26ts%3D496355%26p%3Dfs%26cid%3D1%26sig%3D778c1be552d2c32d662c2d78d081c8fc131aebcced352b99b2b7e3cfcb760fd3%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786876518616&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786876518616&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000c32c822f986d15022fe929f5%26fn%3Dindex_video_locked.html%26cd%3Dattachment%26ts%3D496355%26p%3Dfs%26cid%3D1%26sig%3D92591e7cabea5b0f02eb23e57dbfccd1a94ed16f911db646db73ae0523d936b7%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script></head>
 
 <body>
   <main>
@@ -716,12 +745,15 @@
     <section class="stage">
       <div id="idlePanel">
         <p id="status" aria-live="polite">108本の動画を読み込んでいます…</p>
+        <div id="loadDetail" class="load-detail"></div>
       </div>
 
       <div id="playerWrap">
         <div id="displayPlayer"></div>
+        <div class="player-shield" aria-hidden="true"></div>
       </div>
     </section>
+
 
     <div class="footer">
       <button id="resetButton" class="small-button" type="button">記録をリセット</button>
@@ -796,11 +828,13 @@
     let currentDraw = null;
     let isPlaying = false;
     let completedAllPatternsThisRound = false;
+    let lastResultForShare = "";
 
     let state = loadState();
 
     const handButtons = [...document.querySelectorAll(".hand-button")];
     const statusEl = document.getElementById("status");
+    const loadDetailEl = document.getElementById("loadDetail");
     const idlePanel = document.getElementById("idlePanel");
     const playerWrap = document.getElementById("playerWrap");
     const resultPanel = document.getElementById("resultPanel");
@@ -944,6 +978,14 @@
       updateRewardDisplay();
     }
 
+    function updateLoadDetail() {
+      loadDetailEl.textContent =
+        `G ${loadedLists.G.length}/${EXPECTED_COUNTS.G} / ` +
+        `C ${loadedLists.C.length}/${EXPECTED_COUNTS.C} / ` +
+        `P ${loadedLists.P.length}/${EXPECTED_COUNTS.P} / ` +
+        `L ${loadedLists.L.length}/${EXPECTED_COUNTS.L}`;
+    }
+
     function setHandsEnabled(enabled) {
       handButtons.forEach(button => {
         button.disabled = !enabled;
@@ -978,6 +1020,7 @@
         playerVars: {
           autoplay: 0,
           controls: 0,
+          disablekb: 1,
           playsinline: 1,
           rel: 0
         },
@@ -1030,6 +1073,7 @@
           player.stopVideo();
         } catch (e) {}
 
+        updateLoadDetail();
         tryFinishLoading();
         return;
       }
@@ -1088,6 +1132,7 @@
       }
 
       updateStats();
+      updateLoadDetail();
       setHandsEnabled(catalog.length > 0);
     }
 
@@ -1203,6 +1248,7 @@
         state.charmCount = Math.min(3, state.charmCount + 2);
         const restored = state.charmCount - beforeCharm;
 
+        lastResultForShare = "LUCKY!";
         resultPanel.className = "result result-lucky";
         resultMain.textContent = "LUCKY!";
         resultMain.className = "result-main lucky";
@@ -1247,6 +1293,7 @@
           }
         }
 
+        lastResultForShare = result;
         resultPanel.className = `result result-${result.toLowerCase()}`;
         resultMain.textContent = result;
         resultMain.className = `result-main ${result.toLowerCase()}`;
@@ -1272,6 +1319,8 @@
     }
 
     function shareResultToX() {
+      if (!lastResultForShare) return;
+
       const total = catalog.length || 108;
       const text =
         `剣持じゃんけん
@@ -1360,6 +1409,7 @@
     });
 
     updateStats();
+    updateLoadDetail();
   </script>
 </body>
 </html>

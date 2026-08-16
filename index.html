@@ -516,7 +516,7 @@
       }
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786851321666&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000eb088206ad84257fe4bfd8e5%26fn%3Dindex_share_lucky_bestcolon.html%26cd%3Dattachment%26ts%3D496348%26p%3Dfs%26cid%3D1%26sig%3D4ade4d85093593316214e9d13f8eaeccd2f5084e9bd282f29fd222c7daad1a18%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786851321666&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786851321666&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000e6f08209bee40f1d0a4c50dc%26fn%3Dindex_reward_preview.html%26cd%3Dattachment%26ts%3D496348%26p%3Dfs%26cid%3D1%26sig%3Dafebb08881b19af894b9ce455787aed185e1f18fe725b20cd56b32a5be305bfe%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script></head>
 
 <body>
   <main>
@@ -594,8 +594,8 @@
       <div id="resultDetail" class="result-detail"></div>
       <div id="charmUsedMessage" class="charm-used"></div>
 
-      <div id="rewardArea" class="reward-area" hidden>
-        <div class="reward-message">108連勝達成！</div>
+      <div id="rewardArea" class="reward-area">
+        <div class="reward-message">108連勝達成！ <span style="font-weight:400; opacity:.7;">（プレビュー）</span></div>
         <div class="reward-video">
           <iframe
             src="https://www.youtube.com/embed/X2qLzlWC5h8"
@@ -795,7 +795,7 @@
     }
 
     function updateRewardDisplay() {
-      rewardArea.hidden = !state.rewardUnlocked;
+      rewardArea.hidden = false;
     }
 
     const apiScript = document.createElement("script");

@@ -82,6 +82,91 @@
       opacity: .8;
     }
 
+    .help-row {
+      display: flex;
+      justify-content: center;
+      margin: -14px 0 22px;
+    }
+
+    .help-button {
+      padding: 7px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: .82rem;
+      cursor: pointer;
+    }
+
+    .help-button:hover {
+      color: var(--text);
+      border-color: var(--text);
+    }
+
+    .help-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, .68);
+    }
+
+    .help-modal.open {
+      display: grid;
+    }
+
+    .help-dialog {
+      width: min(560px, 92vw);
+      max-height: 82vh;
+      overflow-y: auto;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      color: var(--text);
+      text-align: left;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, .35);
+    }
+
+    .help-dialog h2 {
+      margin: 0 0 14px;
+      font-size: 1.25rem;
+    }
+
+    .help-dialog ul {
+      margin: 0;
+      padding-left: 1.25em;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .help-dialog li + li {
+      margin-top: 7px;
+    }
+
+    .help-dialog strong {
+      color: var(--text);
+    }
+
+    .help-close {
+      display: block;
+      margin: 18px auto 0;
+      padding: 8px 15px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .help-close:hover {
+      border-color: var(--text);
+    }
+
     .summary {
       display: grid;
       grid-template-columns: 1.6fr .9fr 1.5fr;
@@ -171,34 +256,25 @@
 
     .charm-control {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      gap: 10px;
+      gap: 5px;
       margin: 14px auto 0;
       color: var(--muted);
       font-size: .9rem;
     }
 
-    .charm-toggle {
-      min-width: 128px;
-      padding: 9px 14px;
+    .charm-stock {
+      padding: 8px 14px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: transparent;
       color: var(--text);
-      font: inherit;
-      cursor: pointer;
     }
 
-    .charm-toggle.on {
-      background: rgba(244, 211, 94, .12);
-      border-color: var(--lucky);
-      color: var(--lucky);
-    }
-
-    .charm-toggle:disabled {
-      opacity: .4;
-      cursor: not-allowed;
+    .score-rule {
+      color: var(--muted);
+      font-size: .76rem;
     }
 
     .hand-button {
@@ -520,7 +596,7 @@
       }
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786854927088&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_0000000097b082098fb4f236325af6bf%26fn%3Dindex_mobile_charm_strategy.html%26cd%3Dattachment%26ts%3D496348%26p%3Dfs%26cid%3D1%26sig%3Def71b528cf72f962f1aabca4b26d26603e809e3399320f22249a47d73c34f54a%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786854927088&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786860325470&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000362c8208b8f826d8d2ac6cab%26fn%3Dindex_kenmochi_score_lucky2.html%26cd%3Dattachment%26ts%3D496351%26p%3Dfs%26cid%3D1%26sig%3D2943019052dc886601ccf83888867f5fc373b1e542a8d48541076f0746821943%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786860325470&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 
 <body>
   <main>
@@ -534,6 +610,12 @@
       </a>
     </p>
 
+    <div class="help-row">
+      <button id="helpButton" class="help-button" type="button" aria-haspopup="dialog">
+        ？ ルール
+      </button>
+    </div>
+
     <section class="summary" aria-label="戦績と進捗">
       <div class="summary-card">
         <div class="summary-label">戦績</div>
@@ -546,7 +628,7 @@
       </div>
 
       <div class="summary-card">
-        <div class="summary-label">連勝</div>
+        <div class="summary-label">剣持スコア</div>
         <div class="summary-main"><span id="streakStat">0</span></div>
         <div class="summary-sub">
           BEST <span id="bestStreakStat">0</span>
@@ -574,11 +656,9 @@
       </div>
 
       <div class="charm-control">
-        <span>連勝お守り</span>
-        <button id="charmToggle" class="charm-toggle" type="button" disabled>
-          OFF
-        </button>
-        <span id="charmCountText">0 / 2</span>
+        <div class="charm-stock">
+          スコアお守り <span id="charmCountText">3 / 3</span>
+        </div>
       </div>
     </section>
 
@@ -599,11 +679,11 @@
       <div id="charmUsedMessage" class="charm-used"></div>
 
       <div id="rewardArea" class="reward-area" hidden>
-        <div class="reward-message">108連勝達成！</div>
+        <div class="reward-message">剣持スコア108達成！</div>
         <div class="reward-video">
           <iframe
             src="https://www.youtube.com/embed/X2qLzlWC5h8"
-            title="108連勝 ご褒美動画"
+            title="剣持スコア108 ご褒美動画"
             loading="lazy"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerpolicy="strict-origin-when-cross-origin"
@@ -635,6 +715,24 @@
       </a>
     </p>
   </main>
+
+  <div id="helpModal" class="help-modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="help-dialog">
+      <h2 id="helpTitle">剣持じゃんけん ルール</h2>
+      <ul>
+        <li>グー・チョキ・パーから自分の手を選ぶと、全108パターンからランダムに1本再生されます。</li>
+        <li>一周するまで同じ動画は出ません。108パターンすべて遭遇すると、次の一戦から新しい一周が始まります。</li>
+        <li><strong>WIN / DRAW</strong> では、剣持スコアが <strong>+1</strong> されます。</li>
+        <li><strong>LUCKY</strong> では、剣持スコアが <strong>+2</strong> されます。</li>
+        <li><strong>LOSE</strong> した場合、スコアお守りを持っていれば <strong>1個自動消費</strong>し、剣持スコアを維持したまま <strong>+1</strong> されます。</li>
+        <li>スコアお守りが <strong>0個の状態でLOSE</strong> すると、剣持スコアは <strong>0</strong> に戻ります。</li>
+        <li>スコアお守りは <strong>最大3個</strong>。LUCKYに遭遇すると剣持スコア<strong>+2</strong>に加えて、スコアお守りを <strong>2個補充</strong>します（最大3/3）。</li>
+        <li>LUCKYは通常の勝・敗・分には加算されず、LUCKYとして別に記録されます。</li>
+        <li><strong>こんなテンポ悪いゲームに真面目に向き合うのは時間の無駄なのでやめましょう！</strong></li>
+      </ul>
+      <button id="helpCloseButton" class="help-close" type="button">閉じる</button>
+    </div>
+  </div>
 
   <!-- 再生リスト取得専用。表示用プレイヤーとは完全に分離。 -->
   <div class="playlist-loader"><div id="loaderG"></div></div>
@@ -679,9 +777,6 @@
     let lastResultForShare = "";
 
     let state = loadState();
-    if (state.charmCount <= 0) {
-      state.charmEnabled = false;
-    }
 
     const handButtons = [...document.querySelectorAll(".hand-button")];
     const statusEl = document.getElementById("status");
@@ -700,13 +795,15 @@
     const luckyStat = document.getElementById("luckyStat");
     const streakStat = document.getElementById("streakStat");
     const bestStreakStat = document.getElementById("bestStreakStat");
-    const charmToggle = document.getElementById("charmToggle");
     const charmCountText = document.getElementById("charmCountText");
     const charmUsedMessage = document.getElementById("charmUsedMessage");
     const seenStat = document.getElementById("seenStat");
     const encounterBar = document.getElementById("encounterBar");
     const encounterProgressText = document.getElementById("encounterProgressText");
     const resetButton = document.getElementById("resetButton");
+    const helpButton = document.getElementById("helpButton");
+    const helpModal = document.getElementById("helpModal");
+    const helpCloseButton = document.getElementById("helpCloseButton");
 
     function defaultState() {
       return {
@@ -716,8 +813,7 @@
         lucky: 0,
         streak: 0,
         bestStreak: 0,
-        charmCount: 2,
-        charmEnabled: false,
+        charmCount: 3,
         rewardUnlocked: false,
         seenIds: []
       };
@@ -736,8 +832,13 @@
           lucky: Number(parsed.lucky) || 0,
           streak: Number(parsed.streak) || 0,
           bestStreak: Number(parsed.bestStreak) || 0,
-          charmCount: Math.max(0, Math.min(2, Number(parsed.charmCount) || 0)),
-          charmEnabled: Boolean(parsed.charmEnabled),
+          charmCount: Math.max(
+            0,
+            Math.min(
+              3,
+              parsed.charmCount == null ? 3 : (Number(parsed.charmCount) || 0)
+            )
+          ),
           rewardUnlocked:
             Boolean(parsed.rewardUnlocked) || (Number(parsed.bestStreak) || 0) >= 108,
           seenIds: Array.isArray(parsed.seenIds) ? parsed.seenIds : []
@@ -766,16 +867,8 @@
       luckyStat.textContent = state.lucky;
       streakStat.textContent = state.streak;
       bestStreakStat.textContent = state.bestStreak;
-      charmCountText.textContent = `${state.charmCount} / 2`;
+      charmCountText.textContent = `${state.charmCount} / 3`;
       seenStat.textContent = `${seen} / ${total}`;
-
-      if (state.charmCount <= 0) {
-        state.charmEnabled = false;
-      }
-
-      charmToggle.textContent = state.charmEnabled ? "ON" : "OFF";
-      charmToggle.classList.toggle("on", state.charmEnabled);
-      charmToggle.disabled = state.charmCount <= 0 || isPlaying;
 
       encounterBar.style.width = `${percent}%`;
       encounterProgressText.textContent = `${percent.toFixed(1)}%`;
@@ -794,8 +887,6 @@
       handButtons.forEach(button => {
         button.disabled = !enabled;
       });
-
-      charmToggle.disabled = !enabled || state.charmCount <= 0;
     }
 
     function updateRewardDisplay() {
@@ -969,6 +1060,15 @@
       return "LOSE";
     }
 
+    function addKenmochiScore() {
+      state.streak += 1;
+      state.bestStreak = Math.max(state.bestStreak, state.streak);
+
+      if (state.streak >= 108) {
+        state.rewardUnlocked = true;
+      }
+    }
+
     function startRound(userHand) {
       if (!displayReady || catalog.length === 0 || isPlaying) return;
 
@@ -979,8 +1079,7 @@
 
       currentDraw = {
         userHand,
-        item,
-        useCharm: state.charmEnabled && state.charmCount > 0
+        item
       };
 
       // 抽選された時点で「遭遇済み」とする。
@@ -1025,60 +1124,57 @@
     }
 
     function finishRound() {
-      const { userHand, item, useCharm } = currentDraw;
-
-      // ONにして挑んだ連勝お守りは、結果に関係なくこの1戦で必ず消費。
-      if (useCharm && state.charmCount > 0) {
-        state.charmCount -= 1;
-        state.charmEnabled = false;
-        charmUsedMessage.textContent = "連勝お守りを使用しました。";
-      }
+      const { userHand, item } = currentDraw;
 
       if (item.type === "L") {
         state.lucky += 1;
+        addKenmochiScore();
+        addKenmochiScore();
 
         const beforeCharm = state.charmCount;
-        state.charmCount = Math.min(2, state.charmCount + 1);
+        state.charmCount = Math.min(3, state.charmCount + 2);
+        const restored = state.charmCount - beforeCharm;
 
         lastResultForShare = "LUCKY!";
         resultPanel.className = "result result-lucky";
         resultMain.textContent = "LUCKY!";
         resultMain.className = "result-main lucky";
 
-        if (beforeCharm < 2) {
+        if (restored > 0) {
           resultDetail.textContent =
-            `連勝お守りを1個獲得！ 所持 ${state.charmCount}/2`;
+            `剣持スコア +2 / スコアお守りを${restored}個補充！ 所持 ${state.charmCount}/3`;
         } else {
           resultDetail.textContent =
-            "連勝お守りは満タンです。勝敗には加算されません。";
+            "剣持スコア +2 / スコアお守りは満タンです。";
         }
       } else {
         const result = judge(userHand, item.type);
 
         if (result === "WIN") {
           state.win += 1;
-          state.streak += 1;
-          state.bestStreak = Math.max(state.bestStreak, state.streak);
+          addKenmochiScore();
+          charmUsedMessage.textContent = "剣持スコア +1";
+        }
 
-          if (state.streak >= 108) {
-            state.rewardUnlocked = true;
-          }
+        if (result === "DRAW") {
+          state.draw += 1;
+          addKenmochiScore();
+          charmUsedMessage.textContent = "剣持スコア +1";
         }
 
         if (result === "LOSE") {
           state.lose += 1;
 
-          if (useCharm) {
+          if (state.charmCount > 0) {
+            state.charmCount -= 1;
+            addKenmochiScore();
             charmUsedMessage.textContent =
-              "連勝お守りが発動！連勝記録を維持しました。";
+              "スコアお守りを1個使用！剣持スコア +1";
           } else {
             state.streak = 0;
+            charmUsedMessage.textContent =
+              "スコアお守りなし。剣持スコアが0に戻りました。";
           }
-        }
-
-        if (result === "DRAW") {
-          state.draw += 1;
-          // DRAWでは連勝数を維持
         }
 
         lastResultForShare = result;
@@ -1114,7 +1210,7 @@
 ` +
         `${state.win}勝${state.lose}敗${state.draw}分 / LUCKY ${state.lucky}
 ` +
-        `連勝BEST:${state.bestStreak}`;
+        `剣持スコアBEST:${state.bestStreak}`;
 
       const shareUrl =
         "https://x.com/intent/tweet" +
@@ -1151,17 +1247,34 @@
 
     shareButton.addEventListener("click", shareResultToX);
 
-    charmToggle.addEventListener("click", () => {
-      if (state.charmCount <= 0 || isPlaying) return;
+    function openHelp() {
+      helpModal.classList.add("open");
+      helpCloseButton.focus();
+    }
 
-      state.charmEnabled = !state.charmEnabled;
-      saveState();
-      updateStats();
+    function closeHelp() {
+      helpModal.classList.remove("open");
+      helpButton.focus();
+    }
+
+    helpButton.addEventListener("click", openHelp);
+    helpCloseButton.addEventListener("click", closeHelp);
+
+    helpModal.addEventListener("click", event => {
+      if (event.target === helpModal) {
+        closeHelp();
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && helpModal.classList.contains("open")) {
+        closeHelp();
+      }
     });
 
     resetButton.addEventListener("click", () => {
       const ok = window.confirm(
-        "WIN / LOSE / DRAW / LUCKY / 連勝記録 / 連勝お守り と遭遇履歴をすべてリセットしますか？"
+        "WIN / LOSE / DRAW / LUCKY / 剣持スコア / スコアお守り と遭遇履歴をすべてリセットしますか？"
       );
 
       if (!ok) return;

@@ -243,6 +243,14 @@
       white-space: nowrap;
     }
 
+    .round-secret {
+      visibility: visible;
+    }
+
+    .round-secret.hidden-during-round {
+      visibility: hidden;
+    }
+
     .controls {
       margin: 18px 0;
     }
@@ -619,7 +627,7 @@
 
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786867523617&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000f7f0820682db93cf1d73e973%26fn%3Dindex_result_above_video.html%26cd%3Dattachment%26ts%3D496352%26p%3Dfs%26cid%3D1%26sig%3Dbf321484bebb8e9c6e4fa44f4dd23e6832cb6a1d345be25251ba73a6e7ef1a93%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786867523617&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786867523617&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000e980820c8b00d4b2998c72f9%26fn%3Dindex_hide_strategy_during_video.html%26cd%3Dattachment%26ts%3D496352%26p%3Dfs%26cid%3D1%26sig%3D7b785e355ae21e75958df330f023d31c87d5dc86704e83ba6518a6fe05638693%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786867523617&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 
 <body>
   <main>
@@ -667,7 +675,7 @@
         <div class="progress-track" aria-hidden="true">
           <div id="encounterBar" class="progress-bar"></div>
         </div>
-        <div class="remaining-summary">
+        <div id="remainingSummary" class="remaining-summary round-secret">
           残り G <span id="remainingG">33</span> /
           C <span id="remainingC">33</span> /
           P <span id="remainingP">33</span> /
@@ -681,15 +689,15 @@
       <div class="hands">
         <div class="hand-choice">
           <button class="hand-button" data-hand="G" type="button" disabled>✊ グー</button>
-          <div id="winRateG" class="hand-win-rate">30.6%</div>
+          <div id="winRateG" class="hand-win-rate round-secret">30.6%</div>
         </div>
         <div class="hand-choice">
           <button class="hand-button" data-hand="C" type="button" disabled>✌ チョキ</button>
-          <div id="winRateC" class="hand-win-rate">30.6%</div>
+          <div id="winRateC" class="hand-win-rate round-secret">30.6%</div>
         </div>
         <div class="hand-choice">
           <button class="hand-button" data-hand="P" type="button" disabled>✋ パー</button>
-          <div id="winRateP" class="hand-win-rate">30.6%</div>
+          <div id="winRateP" class="hand-win-rate round-secret">30.6%</div>
         </div>
       </div>
 
@@ -837,6 +845,7 @@
     const encounterProgressText = document.getElementById("encounterProgressText");
     const resetButton = document.getElementById("resetButton");
 
+    const remainingSummary = document.getElementById("remainingSummary");
     const remainingG = document.getElementById("remainingG");
     const remainingC = document.getElementById("remainingC");
     const remainingP = document.getElementById("remainingP");
@@ -972,6 +981,14 @@
       handButtons.forEach(button => {
         button.disabled = !enabled;
       });
+    }
+
+    function setRoundSecretVisible(visible) {
+      const method = visible ? "remove" : "add";
+      remainingSummary.classList[method]("hidden-during-round");
+      winRateG.classList[method]("hidden-during-round");
+      winRateC.classList[method]("hidden-during-round");
+      winRateP.classList[method]("hidden-during-round");
     }
 
     function updateRewardDisplay() {
@@ -1182,6 +1199,7 @@
 
       isPlaying = true;
       setHandsEnabled(false);
+      setRoundSecretVisible(false);
 
       resultPanel.style.display = "none";
       resultPanel.className = "result";
@@ -1287,6 +1305,7 @@
       isPlaying = false;
       currentDraw = null;
       setHandsEnabled(true);
+      setRoundSecretVisible(true);
     }
 
     function shareResultToX() {
@@ -1325,6 +1344,7 @@
       isPlaying = false;
       currentDraw = null;
       setHandsEnabled(true);
+      setRoundSecretVisible(true);
     }
 
     handButtons.forEach(button => {

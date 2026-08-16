@@ -596,7 +596,7 @@
       }
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786860325470&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000362c8208b8f826d8d2ac6cab%26fn%3Dindex_kenmochi_score_lucky2.html%26cd%3Dattachment%26ts%3D496351%26p%3Dfs%26cid%3D1%26sig%3D2943019052dc886601ccf83888867f5fc373b1e542a8d48541076f0746821943%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786860325470&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786860325470&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000c2d882069ae88ade671384e4%26fn%3Dindex_kenmochi_score_help_simple.html%26cd%3Dattachment%26ts%3D496351%26p%3Dfs%26cid%3D1%26sig%3D3880bdb6fd0af91bd671fd9a4c8523b5d22b81573a519569fa8ca437e0e3f7d6%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786860325470&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 
 <body>
   <main>
@@ -720,14 +720,11 @@
     <div class="help-dialog">
       <h2 id="helpTitle">剣持じゃんけん ルール</h2>
       <ul>
-        <li>グー・チョキ・パーから自分の手を選ぶと、全108パターンからランダムに1本再生されます。</li>
-        <li>一周するまで同じ動画は出ません。108パターンすべて遭遇すると、次の一戦から新しい一周が始まります。</li>
-        <li><strong>WIN / DRAW</strong> では、剣持スコアが <strong>+1</strong> されます。</li>
-        <li><strong>LUCKY</strong> では、剣持スコアが <strong>+2</strong> されます。</li>
-        <li><strong>LOSE</strong> した場合、スコアお守りを持っていれば <strong>1個自動消費</strong>し、剣持スコアを維持したまま <strong>+1</strong> されます。</li>
-        <li>スコアお守りが <strong>0個の状態でLOSE</strong> すると、剣持スコアは <strong>0</strong> に戻ります。</li>
-        <li>スコアお守りは <strong>最大3個</strong>。LUCKYに遭遇すると剣持スコア<strong>+2</strong>に加えて、スコアお守りを <strong>2個補充</strong>します（最大3/3）。</li>
-        <li>LUCKYは通常の勝・敗・分には加算されず、LUCKYとして別に記録されます。</li>
+        <li>手を選ぶと、全108パターンからランダムに1本再生。1周するまで同じ動画は出ません。</li>
+        <li><strong>WIN +3 / DRAW +1 / LUCKY +2</strong> で剣持スコアが増えます。</li>
+        <li><strong>LOSE</strong> はスコアお守りを1個自動使用して <strong>+1</strong>。お守り0ならスコアは0に戻ります。</li>
+        <li>スコアお守りは最大3個。<strong>LUCKYで2個補充</strong>します。</li>
+        <li>LUCKYは勝・敗・分とは別に記録されます。</li>
         <li><strong>こんなテンポ悪いゲームに真面目に向き合うのは時間の無駄なのでやめましょう！</strong></li>
       </ul>
       <button id="helpCloseButton" class="help-close" type="button">閉じる</button>
@@ -1153,7 +1150,9 @@
         if (result === "WIN") {
           state.win += 1;
           addKenmochiScore();
-          charmUsedMessage.textContent = "剣持スコア +1";
+          addKenmochiScore();
+          addKenmochiScore();
+          charmUsedMessage.textContent = "剣持スコア +3";
         }
 
         if (result === "DRAW") {

@@ -150,6 +150,38 @@
       margin: 0 auto;
     }
 
+    .charm-control {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin: 14px auto 0;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .charm-toggle {
+      min-width: 128px;
+      padding: 9px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .charm-toggle.on {
+      background: rgba(244, 211, 94, .12);
+      border-color: var(--lucky);
+      color: var(--lucky);
+    }
+
+    .charm-toggle:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
     .hand-button {
       padding: 18px 10px;
       border: 1px solid var(--line);
@@ -289,6 +321,12 @@
       color: var(--muted);
     }
 
+    .charm-used {
+      margin-top: 8px;
+      color: var(--lucky);
+      font-weight: 700;
+    }
+
     .share-button {
       margin-top: 14px;
       padding: 9px 15px;
@@ -334,8 +372,23 @@
       cursor: pointer;
     }
 
+    .contact-link {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    .contact-link a {
+      color: var(--muted);
+      text-underline-offset: 2px;
+    }
+
+    .contact-link a:hover {
+      color: var(--text);
+    }
+
     .special-thanks {
-      margin: 10px 0 0;
+      margin: 8px 0 0;
       color: var(--muted);
       font-size: .72rem;
     }
@@ -415,12 +468,12 @@
       }
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786847726501&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000fe3481f8bbe66bb584261f64%26fn%3Dindex_lucky_sharefix.html%26cd%3Dattachment%26ts%3D496346%26p%3Dfs%26cid%3D1%26sig%3D851365f47ee8e5595013613a085346590a29951b18bfcc516432a96d400fdf2d%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786847726501&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786851321666&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000893882069cb0ccab422390ec%26fn%3Dindex_contact_clean.html%26cd%3Dattachment%26ts%3D496347%26p%3Dfs%26cid%3D1%26sig%3D83c192da84f2c134048aa9ba6046a5c4c3bbacac66b515a2a4555e7ee4fd2acc%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786851321666&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 
 <body>
   <main>
     <h1>剣持じゃんけん</h1>
-    <p class="subtitle">※全パターン遭遇しても何も起こりません</p>
+    <p class="subtitle">※全パターン遭遇・連勝しても何も起こりません</p>
 
     <p class="all-patterns-link">
       じゃんけんせずに全パターン見たい方はこちら→
@@ -443,7 +496,9 @@
       <div class="summary-card">
         <div class="summary-label">連勝</div>
         <div class="summary-main"><span id="streakStat">0</span></div>
-        <div class="summary-sub">BEST <span id="bestStreakStat">0</span></div>
+        <div class="summary-sub">
+          BEST <span id="bestStreakStat">0</span>
+        </div>
       </div>
 
       <div class="summary-card">
@@ -465,6 +520,14 @@
         <button class="hand-button" data-hand="C" type="button" disabled>✌ チョキ</button>
         <button class="hand-button" data-hand="P" type="button" disabled>✋ パー</button>
       </div>
+
+      <div class="charm-control">
+        <span>お守り</span>
+        <button id="charmToggle" class="charm-toggle" type="button" disabled>
+          OFF
+        </button>
+        <span id="charmCountText">0 / 2</span>
+      </div>
     </section>
 
     <section class="stage">
@@ -481,6 +544,7 @@
     <section id="resultPanel" class="result" aria-live="polite">
       <div id="resultMain" class="result-main"></div>
       <div id="resultDetail" class="result-detail"></div>
+      <div id="charmUsedMessage" class="charm-used"></div>
       <button id="shareButton" class="share-button" type="button">
         Xで結果をシェア（試験）
       </button>
@@ -489,6 +553,13 @@
     <div class="footer">
       <button id="resetButton" class="small-button" type="button">記録をリセット</button>
     </div>
+
+    <p class="contact-link">
+      何かあればこちらに→
+      <a href="https://x.com/nozakita_kazumi" target="_blank" rel="noopener noreferrer">
+        nozakita kazumi
+      </a>
+    </p>
 
     <p class="special-thanks">
       Special Thanks：
@@ -541,6 +612,9 @@
     let lastResultForShare = "";
 
     let state = loadState();
+    if (state.charmCount <= 0) {
+      state.charmEnabled = false;
+    }
 
     const handButtons = [...document.querySelectorAll(".hand-button")];
     const statusEl = document.getElementById("status");
@@ -558,6 +632,9 @@
     const luckyStat = document.getElementById("luckyStat");
     const streakStat = document.getElementById("streakStat");
     const bestStreakStat = document.getElementById("bestStreakStat");
+    const charmToggle = document.getElementById("charmToggle");
+    const charmCountText = document.getElementById("charmCountText");
+    const charmUsedMessage = document.getElementById("charmUsedMessage");
     const seenStat = document.getElementById("seenStat");
     const encounterBar = document.getElementById("encounterBar");
     const encounterProgressText = document.getElementById("encounterProgressText");
@@ -571,6 +648,8 @@
         lucky: 0,
         streak: 0,
         bestStreak: 0,
+        charmCount: 0,
+        charmEnabled: false,
         seenIds: []
       };
     }
@@ -588,6 +667,8 @@
           lucky: Number(parsed.lucky) || 0,
           streak: Number(parsed.streak) || 0,
           bestStreak: Number(parsed.bestStreak) || 0,
+          charmCount: Math.max(0, Math.min(2, Number(parsed.charmCount) || 0)),
+          charmEnabled: Boolean(parsed.charmEnabled),
           seenIds: Array.isArray(parsed.seenIds) ? parsed.seenIds : []
         };
       } catch (e) {
@@ -614,7 +695,16 @@
       luckyStat.textContent = state.lucky;
       streakStat.textContent = state.streak;
       bestStreakStat.textContent = state.bestStreak;
+      charmCountText.textContent = `${state.charmCount} / 2`;
       seenStat.textContent = `${seen} / ${total}`;
+
+      if (state.charmCount <= 0) {
+        state.charmEnabled = false;
+      }
+
+      charmToggle.textContent = state.charmEnabled ? "ON" : "OFF";
+      charmToggle.classList.toggle("on", state.charmEnabled);
+      charmToggle.disabled = state.charmCount <= 0 || isPlaying;
 
       encounterBar.style.width = `${percent}%`;
       encounterProgressText.textContent = `${percent.toFixed(1)}%`;
@@ -632,6 +722,8 @@
       handButtons.forEach(button => {
         button.disabled = !enabled;
       });
+
+      charmToggle.disabled = !enabled || state.charmCount <= 0;
     }
 
     const apiScript = document.createElement("script");
@@ -835,6 +927,7 @@
       resultMain.className = "result-main";
       resultMain.textContent = "";
       resultDetail.textContent = "";
+      charmUsedMessage.textContent = "";
 
       idlePanel.style.display = "none";
       playerWrap.style.display = "block";
@@ -860,11 +953,21 @@
       if (item.type === "L") {
         state.lucky += 1;
 
+        const beforeCharm = state.charmCount;
+        state.charmCount = Math.min(2, state.charmCount + 1);
+
         lastResultForShare = "LUCKY!";
         resultPanel.className = "result result-lucky";
         resultMain.textContent = "LUCKY!";
         resultMain.className = "result-main lucky";
-        resultDetail.textContent = "勝敗には加算されません。";
+
+        if (beforeCharm < 2) {
+          resultDetail.textContent =
+            `お守りを1個獲得！ 所持 ${state.charmCount}/2`;
+        } else {
+          resultDetail.textContent =
+            "お守りは満タンです。勝敗には加算されません。";
+        }
       } else {
         const result = judge(userHand, item.type);
 
@@ -876,7 +979,18 @@
 
         if (result === "LOSE") {
           state.lose += 1;
-          state.streak = 0;
+
+          if (state.charmEnabled && state.charmCount > 0) {
+            state.charmCount -= 1;
+            charmUsedMessage.textContent =
+              "お守りを使用！連勝記録を維持しました。";
+
+            if (state.charmCount <= 0) {
+              state.charmEnabled = false;
+            }
+          } else {
+            state.streak = 0;
+          }
         }
 
         if (result === "DRAW") {
@@ -952,9 +1066,17 @@
 
     shareButton.addEventListener("click", shareResultToX);
 
+    charmToggle.addEventListener("click", () => {
+      if (state.charmCount <= 0 || isPlaying) return;
+
+      state.charmEnabled = !state.charmEnabled;
+      saveState();
+      updateStats();
+    });
+
     resetButton.addEventListener("click", () => {
       const ok = window.confirm(
-        "WIN / LOSE / DRAW / LUCKY / 連勝記録 と遭遇履歴をすべてリセットしますか？"
+        "WIN / LOSE / DRAW / LUCKY / 連勝記録 / お守り と遭遇履歴をすべてリセットしますか？"
       );
 
       if (!ok) return;

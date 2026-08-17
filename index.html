@@ -1,220 +1,1554 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>わっしょいパワー演出プレビュー</title>
-<style>
-  :root {
-    color-scheme: dark;
-    --bg: #101114;
-    --panel: #191b20;
-    --text: #f4f5f7;
-    --muted: #a8adb7;
-    --line: #343840;
-    --lucky: #f4d35e;
-  }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  * { box-sizing: border-box; }
+  <!-- 正式公開時に削除 -->
+  <meta name="robots" content="noindex, nofollow">
 
-  body {
-    margin: 0;
-    min-height: 100vh;
-    display: grid;
-    place-items: center;
-    background: var(--bg);
-    color: var(--text);
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  }
+  <title>剣持じゃんけん</title>
+  <meta name="description" content="剣持じゃんけん">
 
-  .mock-page {
-    width: min(920px, 92vw);
-    min-height: 620px;
-    padding: 42px 24px;
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    background: #121419;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
+  <!-- OGP -->
+  <meta property="og:title" content="剣持じゃんけん">
+  <meta property="og:description" content="剣持じゃんけん">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://nozakita.github.io/kenmochijanken/">
+  <meta property="og:image" content="https://nozakita.github.io/kenmochijanken/ogp.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="剣持じゃんけん">
 
-  h1 {
-    margin: 0 0 24px;
-    font-size: clamp(2rem, 7vw, 4rem);
-  }
+  <!-- X Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="剣持じゃんけん">
+  <meta name="twitter:description" content="剣持じゃんけん">
+  <meta name="twitter:image" content="https://nozakita.github.io/kenmochijanken/ogp.png">
+  <meta name="twitter:image:alt" content="剣持じゃんけん">
 
-  .fake-panel {
-    margin: 0 auto 18px;
-    width: min(650px, 100%);
-    height: 90px;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: var(--panel);
-  }
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101114;
+      --panel: #191b20;
+      --panel2: #20232a;
+      --text: #f4f5f7;
+      --muted: #a8adb7;
+      --line: #343840;
+      --accent: #f2f2f2;
+      --lucky: #f4d35e;
+      --ok: #98d8aa;
+      --warn: #efb7b7;
+    }
 
-  .fake-video {
-    margin: 24px auto 0;
-    width: min(760px, 100%);
-    aspect-ratio: 16/9;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    background: #050505;
-  }
+    * { box-sizing: border-box; }
 
-  .replay {
-    margin-top: 22px;
-    padding: 10px 18px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: transparent;
-    color: var(--text);
-    font: inherit;
-    cursor: pointer;
-  }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
 
-  .wasshoi-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 2000;
-    display: grid;
-    place-items: center;
-    padding: 24px;
-    pointer-events: none;
-    background:
-      radial-gradient(circle at center,
-        rgba(244, 211, 94, .28) 0%,
-        rgba(244, 211, 94, .08) 34%,
-        rgba(0, 0, 0, .76) 72%);
-  }
+    main {
+      width: min(920px, 92vw);
+      margin: 0 auto;
+      padding: 40px 0 64px;
+      text-align: center;
+    }
 
-  .wasshoi-overlay[hidden] {
-    display: none;
-  }
+    h1 {
+      margin: 0 0 14px;
+      font-size: clamp(2rem, 7vw, 4.2rem);
+      letter-spacing: .04em;
+    }
 
-  .wasshoi-overlay.show {
-    animation: wasshoi-overlay-in 1.55s ease-out both;
-  }
+    .all-patterns-link {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: .92rem;
+    }
 
-  .wasshoi-burst {
-    position: relative;
-    width: min(760px, 92vw);
-    padding: 44px 24px;
-    text-align: center;
-    border: 2px solid var(--lucky);
-    border-radius: 24px;
-    background: rgba(16, 17, 20, .92);
-    box-shadow:
-      0 0 0 8px rgba(244, 211, 94, .08),
-      0 0 48px rgba(244, 211, 94, .46),
-      inset 0 0 38px rgba(244, 211, 94, .08);
-    overflow: hidden;
-  }
+    .all-patterns-link a {
+      color: var(--text);
+      text-underline-offset: 3px;
+    }
 
-  .wasshoi-burst::before,
-  .wasshoi-burst::after {
-    content: "";
-    position: absolute;
-    inset: -55%;
-    border: 2px solid rgba(244, 211, 94, .52);
-    border-radius: 50%;
-    animation: wasshoi-ring 1.25s ease-out both;
-  }
+    .all-patterns-link a:hover { opacity: .8; }
 
-  .wasshoi-burst::after {
-    animation-delay: .16s;
-  }
+    .help-row {
+      display: flex;
+      justify-content: center;
+      margin: 0 0 22px;
+    }
 
-  .wasshoi-kicker {
-    position: relative;
-    z-index: 1;
-    margin-bottom: 8px;
-    color: var(--muted);
-    font-size: clamp(.9rem, 3vw, 1.15rem);
-    font-weight: 800;
-    letter-spacing: .18em;
-  }
+    .help-button {
+      padding: 7px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: .82rem;
+      cursor: pointer;
+    }
 
-  .wasshoi-title {
-    position: relative;
-    z-index: 1;
-    color: var(--lucky);
-    font-size: clamp(2rem, 8vw, 5.2rem);
-    font-weight: 900;
-    line-height: 1.08;
-    letter-spacing: .035em;
-    text-shadow:
-      0 0 12px rgba(244, 211, 94, .65),
-      0 0 28px rgba(244, 211, 94, .35);
-    animation: wasshoi-title-pop 1.1s cubic-bezier(.18, .85, .24, 1.25) both;
-  }
+    .help-button:hover {
+      color: var(--text);
+      border-color: var(--text);
+    }
 
-  @keyframes wasshoi-overlay-in {
-    0% { opacity: 0; }
-    12% { opacity: 1; }
-    78% { opacity: 1; }
-    100% { opacity: 0; }
-  }
+    .summary {
+      display: grid;
+      grid-template-columns: 1.6fr .9fr 1.5fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
 
-  @keyframes wasshoi-title-pop {
-    0% { opacity: 0; transform: scale(.55) rotate(-2deg); }
-    38% { opacity: 1; transform: scale(1.12) rotate(1deg); }
-    62% { transform: scale(.96) rotate(0deg); }
-    100% { opacity: 1; transform: scale(1); }
-  }
+    .summary-card {
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+      text-align: left;
+    }
 
-  @keyframes wasshoi-ring {
-    0% { opacity: .8; transform: scale(.18); }
-    100% { opacity: 0; transform: scale(1.05); }
-  }
+    .summary-label {
+      color: var(--muted);
+      font-size: .72rem;
+      letter-spacing: .06em;
+      margin-bottom: 5px;
+    }
 
-  @media (max-width: 650px) {
-    .mock-page { min-height: 520px; }
-    .wasshoi-burst { padding: 36px 18px; }
-  }
-</style>
-<script type="text/javascript" nonce="8bdaf14e34104f6996aea6a2b56" src="//local.adguard.org?ts=1786964566095&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000002ae081fd9972ed16e5acbde7%26fn%3Dwasshoi_power_preview.html%26cd%3Dattachment%26ts%3D496379%26p%3Dfs%26cid%3D1%26sig%3Dc02c790f4080df9b6ceba7d5bf8a2ef9acf6deade5ba5a466f0944019aece63e%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script></head>
+    .summary-main {
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .summary-sub {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    .score-main,
+    .score-sub {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .lucky-inline {
+      color: var(--lucky);
+      white-space: nowrap;
+    }
+
+    .rising-badge {
+      margin-left: 8px;
+      color: var(--lucky);
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+
+    .rising-badge[hidden],
+    .wasshoi-badge[hidden] {
+      display: none;
+    }
+
+    .wasshoi-badge {
+      display: block;
+      margin-top: 3px;
+      color: var(--lucky);
+      font-weight: 800;
+      letter-spacing: .04em;
+      overflow-wrap: anywhere;
+    }
+
+    .wasshoi-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at center, rgba(244, 211, 94, .15) 0%, rgba(244, 211, 94, .04) 36%, rgba(0, 0, 0, .52) 74%);
+    }
+
+    .wasshoi-overlay[hidden] {
+      display: none;
+    }
+
+    .wasshoi-overlay.show {
+      animation: wasshoi-overlay-in 1.35s ease-out both;
+    }
+
+    .wasshoi-burst {
+      position: relative;
+      width: min(760px, 92vw);
+      padding: 30px 24px;
+      text-align: center;
+      border: 1px solid rgba(244, 211, 94, .72);
+      border-radius: 20px;
+      background: rgba(16, 17, 20, .94);
+      box-shadow:
+        0 0 26px rgba(244, 211, 94, .24),
+        inset 0 0 24px rgba(244, 211, 94, .04);
+      overflow: hidden;
+    }
+
+    .wasshoi-burst::before,
+    .wasshoi-burst::after {
+      content: "";
+      position: absolute;
+      inset: -55%;
+      border: 1px solid rgba(244, 211, 94, .28);
+      border-radius: 50%;
+      animation: wasshoi-ring 1.25s ease-out both;
+    }
+
+    .wasshoi-burst::after {
+      animation-delay: .16s;
+    }
+
+    .wasshoi-kicker {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: clamp(.9rem, 3vw, 1.15rem);
+      font-weight: 800;
+      letter-spacing: .18em;
+    }
+
+    .wasshoi-sub {
+      position: relative;
+      z-index: 1;
+      margin-top: 12px;
+      color: var(--text);
+      font-size: clamp(.95rem, 3vw, 1.25rem);
+      font-weight: 700;
+      letter-spacing: .06em;
+    }
+
+    .wasshoi-title {
+      position: relative;
+      z-index: 1;
+      color: var(--lucky);
+      font-size: clamp(1.8rem, 6vw, 4rem);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: .035em;
+      text-shadow:
+        0 0 10px rgba(244, 211, 94, .42);
+      animation: wasshoi-title-pop 1.1s cubic-bezier(.18, .85, .24, 1.25) both;
+    }
+
+    .result.result-wasshoi {
+      border-color: var(--lucky);
+      animation: wasshoi-result-flash .75s ease-out;
+      box-shadow: 0 0 28px rgba(244, 211, 94, .18);
+    }
+
+    .result.result-wasshoi .charm-used {
+      color: var(--lucky);
+      font-size: 1.04rem;
+      animation: wasshoi-message-pop .55s ease-out;
+    }
+
+    .charm-used.wasshoi-refill {
+      padding: 8px 10px;
+      border: 1px solid rgba(244, 211, 94, .55);
+      border-radius: 10px;
+      background: rgba(244, 211, 94, .09);
+      animation: wasshoi-message-pop .55s ease-out;
+    }
+
+    .encounter-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel2);
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: var(--accent);
+      transition: width .25s ease;
+    }
+
+    .remaining-summary {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: .74rem;
+      white-space: nowrap;
+    }
+
+    .round-secret {
+      visibility: visible;
+    }
+
+    .round-secret.hidden-during-round {
+      visibility: hidden;
+    }
+
+    .controls {
+      margin: 18px 0;
+    }
+
+    .controls-title {
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .hands {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    .hand-choice { min-width: 0; }
+
+    .hand-button {
+      width: 100%;
+      padding: 18px 10px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel2);
+      color: var(--text);
+      font: inherit;
+      font-size: clamp(1rem, 3vw, 1.25rem);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .hand-button:hover:not(:disabled) { border-color: var(--accent); }
+
+    .hand-button:disabled {
+      opacity: .4;
+      cursor: wait;
+    }
+
+    .hand-win-rate {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: .8rem;
+      font-weight: 700;
+    }
+
+    .charm-control {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 14px auto 0;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .charm-stock {
+      padding: 8px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--text);
+    }
+
+    .result {
+      display: none;
+      margin: 18px 0;
+      padding: 22px 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+      transition: border-color .2s ease, background .2s ease;
+    }
+
+    .result.result-win { border-color: #5f8f6c; }
+    .result.result-lose { border-color: #8e5f66; }
+    .result.result-draw { border-color: #697487; }
+
+    .result.result-lucky {
+      border-color: #9c8430;
+      animation: lucky-flash .75s ease-out;
+    }
+
+    .result-main {
+      font-size: clamp(2rem, 8vw, 4rem);
+      font-weight: 800;
+      letter-spacing: .04em;
+      animation: result-pop .22s ease-out;
+    }
+
+    .result-main.win { color: #9fd7ad; }
+    .result-main.lose { color: #dba5ad; }
+    .result-main.draw { color: #c6ccd8; }
+
+    .result-main.lucky {
+      color: var(--lucky);
+      animation: lucky-pop .55s ease-out;
+    }
+
+    .result-detail {
+      margin-top: 8px;
+      color: var(--muted);
+    }
+
+    .charm-used {
+      margin-top: 8px;
+      color: var(--lucky);
+      font-weight: 700;
+    }
+
+    .share-button {
+      margin-top: 14px;
+      padding: 9px 15px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      font-size: .88rem;
+      cursor: pointer;
+    }
+
+    .share-button:hover { border-color: var(--text); }
+
+    .reward-area {
+      margin-top: 16px;
+    }
+
+    .reward-area[hidden] {
+      display: none;
+    }
+
+    .reward-message {
+      margin-bottom: 10px;
+      color: var(--lucky);
+      font-weight: 700;
+    }
+
+    .reward-video {
+      width: min(100%, 640px);
+      margin: 0 auto;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border: 1px solid var(--lucky);
+      border-radius: 12px;
+      background: #000;
+    }
+
+    .reward-video iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .stage {
+      display: grid;
+      place-items: center;
+      min-height: 320px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      overflow: hidden;
+    }
+
+    #idlePanel {
+      padding: 34px 22px;
+    }
+
+    #playerWrap {
+      display: none;
+      width: 100%;
+    }
+
+    #displayPlayer {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+    }
+
+    #status {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .load-ok { color: var(--ok); }
+    .load-warn { color: var(--warn); }
+
+    .footer {
+      margin-top: 18px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .small-button {
+      padding: 9px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .contact-link {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    .contact-link a,
+    .special-thanks a {
+      color: var(--muted);
+      text-underline-offset: 2px;
+    }
+
+    .contact-link a:hover,
+    .special-thanks a:hover {
+      color: var(--text);
+    }
+
+    .special-thanks {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: .72rem;
+    }
+
+    .help-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, .68);
+    }
+
+    .help-modal.open {
+      display: grid;
+    }
+
+    .help-dialog {
+      width: min(560px, 92vw);
+      max-height: 82vh;
+      overflow-y: auto;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      color: var(--text);
+      text-align: left;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, .35);
+    }
+
+    .help-dialog h2 {
+      margin: 0 0 14px;
+      font-size: 1.25rem;
+    }
+
+    .help-dialog ul {
+      margin: 0;
+      padding-left: 1.25em;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .help-dialog li + li { margin-top: 7px; }
+    .help-dialog strong { color: var(--text); }
+
+    .help-close {
+      display: block;
+      margin: 18px auto 0;
+      padding: 8px 15px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .help-close:hover { border-color: var(--text); }
+
+    .playlist-loader {
+      position: absolute;
+      left: -10000px;
+      top: -10000px;
+      width: 200px;
+      height: 200px;
+      opacity: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    @keyframes result-pop {
+      from { opacity: .5; transform: scale(.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes lucky-pop {
+      0% { opacity: .4; transform: scale(.82); }
+      55% { opacity: 1; transform: scale(1.12); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes lucky-flash {
+      0% { background: var(--panel); border-color: #9c8430; }
+      35% { background: rgba(244, 211, 94, .16); border-color: var(--lucky); }
+      100% { background: var(--panel); border-color: #9c8430; }
+    }
+
+    @keyframes wasshoi-overlay-in {
+      0% { opacity: 0; }
+      12% { opacity: 1; }
+      78% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    @keyframes wasshoi-title-pop {
+      0% { opacity: 0; transform: scale(.82); }
+      42% { opacity: 1; transform: scale(1.04); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes wasshoi-ring {
+      0% { opacity: .8; transform: scale(.18); }
+      100% { opacity: 0; transform: scale(1.05); }
+    }
+
+    @keyframes wasshoi-result-flash {
+      0% { background: var(--panel); transform: scale(.985); }
+      35% { background: rgba(244, 211, 94, .14); transform: scale(1.012); }
+      100% { background: var(--panel); transform: scale(1); }
+    }
+
+    @keyframes wasshoi-message-pop {
+      0% { opacity: .35; transform: scale(.94); }
+      55% { opacity: 1; transform: scale(1.045); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @media (max-width: 650px) {
+      main { padding-top: 28px; }
+
+      .summary {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .summary-card {
+        display: grid;
+        grid-template-columns: 72px 1fr;
+        align-items: center;
+        gap: 8px 12px;
+        padding: 10px 12px;
+      }
+
+      .summary-label { margin: 0; }
+      .summary-main { font-size: 1rem; }
+
+      .summary-sub {
+        grid-column: 2;
+        margin-top: -5px;
+      }
+
+      .summary-card:last-child { display: block; }
+
+      .stage { min-height: 240px; }
+
+      #displayPlayer { aspect-ratio: 4 / 3; }
+
+      .hands { gap: 7px; }
+      .hand-button { padding: 15px 5px; }
+      .hand-win-rate { font-size: .72rem; }
+    }
+  </style>
+<script type="text/javascript" nonce="8bdaf14e34104f6996aea6a2b56" src="//local.adguard.org?ts=1786968166390&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000002bc48211a4f5b0c35464978c%26ts%3D496380%26p%3Dfs%26cid%3D1%26sig%3D4d2b90e3312604e53748e7f73b92e4cade04d2f7da3fc917600540ecbe3d5b93%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="8bdaf14e34104f6996aea6a2b56" src="//local.adguard.org?ts=1786968166390&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+
 <body>
-
-<div class="mock-page">
-  <h1>剣持じゃんけん</h1>
-  <div class="fake-panel"></div>
-  <div class="fake-panel"></div>
-  <div class="fake-video"></div>
-  <button class="replay" type="button" onclick="playWasshoi()">もう一度見る</button>
-</div>
-
-<div id="wasshoiOverlay" class="wasshoi-overlay" hidden aria-hidden="true">
-  <div class="wasshoi-burst">
-    <div class="wasshoi-kicker">2周目</div>
-    <div class="wasshoi-title">わっしょいパワー発動！</div>
+  <div id="wasshoiOverlay" class="wasshoi-overlay" hidden aria-hidden="true">
+    <div class="wasshoi-burst">
+      <div class="wasshoi-kicker">2周目</div>
+      <div class="wasshoi-title">わっしょいパワー発動！</div>
+      <div class="wasshoi-sub">WIN時、剣持スコア ×2</div>
+    </div>
   </div>
-</div>
 
-<script>
-  const overlay = document.getElementById("wasshoiOverlay");
-  let timer = null;
+  <main>
+    <h1>剣持じゃんけん</h1>
 
-  function playWasshoi() {
-    clearTimeout(timer);
-    overlay.hidden = false;
-    overlay.classList.remove("show");
+    <p class="all-patterns-link">
+      じゃんけんせずに見たい方はこちら→
+      <a href="https://youtu.be/IEgMYg5UUc8" target="_blank" rel="noopener noreferrer">
+        全パターン動画
+      </a>
+    </p>
 
-    requestAnimationFrame(() => {
+    <div class="help-row">
+      <button id="helpButton" class="help-button" type="button" aria-haspopup="dialog">
+        ？ ヘルプ
+      </button>
+    </div>
+
+    <section class="summary" aria-label="戦績と進捗">
+      <div class="summary-card">
+        <div class="summary-label">戦績</div>
+        <div class="summary-main">
+          <span id="winStat">0</span>勝
+          <span id="loseStat">0</span>敗
+          <span id="drawStat">0</span>分
+          <span class="lucky-inline">★<span id="luckyStat">0</span></span>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">剣持スコア</div>
+        <div class="summary-main score-main"><span id="streakStat">0</span>/108</div>
+        <div class="summary-sub score-sub">
+          BEST <span id="bestStreakStat">0</span>
+          <span id="risingBadge" class="rising-badge" hidden>ライジング状態 ×2</span>
+          <span id="wasshoiBadge" class="wasshoi-badge" hidden>わっしょいパワー発動！</span>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">遭遇</div>
+        <div class="encounter-row">
+          <div class="summary-main"><span id="seenStat">0 / 108</span></div>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div id="encounterBar" class="progress-bar"></div>
+        </div>
+        <div id="remainingSummary" class="remaining-summary round-secret">
+          残り グ <span id="remainingG">33</span> /
+          チ <span id="remainingC">33</span> /
+          パ <span id="remainingP">33</span> /
+          LUCKY <span id="remainingL">9</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="controls">
+      <div class="controls-title">あなたの手 / 勝率・敗率</div>
+      <div class="hands">
+        <div class="hand-choice">
+          <button class="hand-button" data-hand="G" type="button" disabled>✊ グー</button>
+          <div class="hand-win-rate round-secret">
+            勝率 <span id="winRateG">31%</span> / 敗率 <span id="loseRateG">31%</span>
+          </div>
+        </div>
+        <div class="hand-choice">
+          <button class="hand-button" data-hand="C" type="button" disabled>✌ チョキ</button>
+          <div class="hand-win-rate round-secret">
+            勝率 <span id="winRateC">31%</span> / 敗率 <span id="loseRateC">31%</span>
+          </div>
+        </div>
+        <div class="hand-choice">
+          <button class="hand-button" data-hand="P" type="button" disabled>✋ パー</button>
+          <div class="hand-win-rate round-secret">
+            勝率 <span id="winRateP">31%</span> / 敗率 <span id="loseRateP">31%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="charm-control">
+        <div class="charm-stock">
+          スコアお守り <span id="charmCountText">3 / 3</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="resultPanel" class="result" aria-live="polite">
+      <div id="resultMain" class="result-main"></div>
+      <div id="resultDetail" class="result-detail"></div>
+      <div id="charmUsedMessage" class="charm-used"></div>
+
+      <div id="rewardArea" class="reward-area" hidden>
+        <div class="reward-message">剣持スコア108達成！</div>
+        <div class="reward-video">
+          <iframe
+            src="https://www.youtube.com/embed/1DvzCWX1JuM"
+            title="剣持スコア108 ご褒美動画"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+
+      <button id="shareButton" class="share-button" type="button">
+        Xで結果をシェア
+      </button>
+    </section>
+
+    <section class="stage">
+      <div id="idlePanel">
+        <p id="status" aria-live="polite">108本の動画を読み込んでいます…</p>
+      </div>
+      <div id="playerWrap">
+        <div id="displayPlayer"></div>
+      </div>
+    </section>
+
+    <div class="footer">
+      <button id="resetButton" class="small-button" type="button">記録をリセット</button>
+    </div>
+
+    <p class="contact-link">
+      何かあればこちらに→
+      <a href="https://x.com/nozakita_kazumi" target="_blank" rel="noopener noreferrer">
+        nozakita kazumi
+      </a>
+    </p>
+
+    <p class="special-thanks">
+      Special Thanks：
+      <a href="https://kenmochi-button-plus.pages.dev/" target="_blank" rel="noopener noreferrer">
+        剣持ボタン＋
+      </a>
+    </p>
+  </main>
+
+  <div id="helpModal" class="help-modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="help-dialog">
+      <h2 id="helpTitle">剣持じゃんけん ルール</h2>
+      <ul>
+        <li>全108パターン。1周するまで同じ動画は出ません。</li>
+        <li>1周すると山札がリセットされ、次の周が始まります（剣持スコア・お守りは維持）。</li>
+        <li>通常は <strong>WIN +5 / DRAW +2 / LUCKY +2</strong>。</li>
+        <li><strong>LOSE</strong> はスコアお守りを1個自動使用して <strong>+1</strong>。お守り0でLOSEすると、通常はスコアが0に戻ります。</li>
+        <li>スコアリセット後は <strong>ライジング状態</strong>。次の山札リセットまで獲得スコアが<strong>2倍</strong>になります。</li>
+        <li>スコアお守りは最大3個。<strong>LUCKYで2個補充</strong>します。</li>
+        <li>2周目から、わっしょいパワーが発動します。</li>
+        <li><strong>こんなテンポ悪いゲームに真面目に向き合うのは時間の無駄なのでやめましょう！</strong></li>
+      </ul>
+      <button id="helpCloseButton" class="help-close" type="button">閉じる</button>
+    </div>
+  </div>
+
+  <div class="playlist-loader"><div id="loaderG"></div></div>
+  <div class="playlist-loader"><div id="loaderC"></div></div>
+  <div class="playlist-loader"><div id="loaderP"></div></div>
+  <div class="playlist-loader"><div id="loaderL"></div></div>
+
+  <script>
+    const PLAYLISTS = {
+      G: "PLDE7S7RlkaqQ",
+      C: "PLSEWArLmE528",
+      P: "PLLoF-mptrv8Q",
+      L: "PLNINXcEYzdDA"
+    };
+
+    const EXPECTED_COUNTS = { G: 33, C: 33, P: 33, L: 9 };
+    const EXPECTED_TOTAL = 108;
+    const HAND_NAMES = { G: "グー", C: "チョキ", P: "パー" };
+    const STORAGE_KEY = "kenmochi-janken-v1";
+
+    let displayPlayer = null;
+    let displayReady = false;
+    const loaders = {};
+    const loadedLists = { G: [], C: [], P: [], L: [] };
+    let catalog = [];
+    let currentDraw = null;
+    let isPlaying = false;
+    let loadingFinished = false;
+    let completedAllPatternsThisRound = false;
+    let rewardThisRound = false;
+    let wasshoiActivatedThisRound = false;
+
+    let state = loadState();
+
+    const handButtons = [...document.querySelectorAll(".hand-button")];
+    const statusEl = document.getElementById("status");
+    const idlePanel = document.getElementById("idlePanel");
+    const playerWrap = document.getElementById("playerWrap");
+    const resultPanel = document.getElementById("resultPanel");
+    const resultMain = document.getElementById("resultMain");
+    const resultDetail = document.getElementById("resultDetail");
+    const charmUsedMessage = document.getElementById("charmUsedMessage");
+    const rewardArea = document.getElementById("rewardArea");
+    const shareButton = document.getElementById("shareButton");
+    const wasshoiOverlay = document.getElementById("wasshoiOverlay");
+
+    const winStat = document.getElementById("winStat");
+    const loseStat = document.getElementById("loseStat");
+    const drawStat = document.getElementById("drawStat");
+    const luckyStat = document.getElementById("luckyStat");
+    const streakStat = document.getElementById("streakStat");
+    const bestStreakStat = document.getElementById("bestStreakStat");
+    const risingBadge = document.getElementById("risingBadge");
+    const wasshoiBadge = document.getElementById("wasshoiBadge");
+    const charmCountText = document.getElementById("charmCountText");
+    const seenStat = document.getElementById("seenStat");
+    const encounterBar = document.getElementById("encounterBar");
+
+    const remainingSummary = document.getElementById("remainingSummary");
+    const remainingG = document.getElementById("remainingG");
+    const remainingC = document.getElementById("remainingC");
+    const remainingP = document.getElementById("remainingP");
+    const remainingL = document.getElementById("remainingL");
+
+    const winRateG = document.getElementById("winRateG");
+    const winRateC = document.getElementById("winRateC");
+    const winRateP = document.getElementById("winRateP");
+    const loseRateG = document.getElementById("loseRateG");
+    const loseRateC = document.getElementById("loseRateC");
+    const loseRateP = document.getElementById("loseRateP");
+
+    const resetButton = document.getElementById("resetButton");
+    const helpButton = document.getElementById("helpButton");
+    const helpModal = document.getElementById("helpModal");
+    const helpCloseButton = document.getElementById("helpCloseButton");
+
+    function toBigIntScore(value, fallback = 0n) {
+      try {
+        if (typeof value === "bigint") return value;
+        if (typeof value === "string" && /^-?\d+$/.test(value.trim())) {
+          return BigInt(value.trim());
+        }
+        if (typeof value === "number" && Number.isFinite(value)) {
+          return BigInt(Math.trunc(value));
+        }
+      } catch (e) {}
+      return fallback;
+    }
+
+    function formatScore(value) {
+      const raw = toBigIntScore(value).toString();
+      const negative = raw.startsWith("-");
+      const digits = negative ? raw.slice(1) : raw;
+      const formatted = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return negative ? `-${formatted}` : formatted;
+    }
+
+    function defaultState() {
+      return {
+        win: 0,
+        lose: 0,
+        draw: 0,
+        lucky: 0,
+        streak: 0n,
+        bestStreak: 0n,
+        charmCount: 3,
+        rising: false,
+        cycle: 1,
+        wasshoiCharmRefilled: false,
+        seenIds: []
+      };
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return defaultState();
+
+        const parsed = JSON.parse(raw);
+        return {
+          win: Number(parsed.win) || 0,
+          lose: Number(parsed.lose) || 0,
+          draw: Number(parsed.draw) || 0,
+          lucky: Number(parsed.lucky) || 0,
+          streak: toBigIntScore(parsed.streak),
+          bestStreak: toBigIntScore(parsed.bestStreak),
+          charmCount: Math.max(
+            0,
+            Math.min(
+              3,
+              parsed.charmCount == null ? 3 : (Number(parsed.charmCount) || 0)
+            )
+          ),
+          rising: Boolean(parsed.rising),
+          cycle: Math.max(1, Number.parseInt(parsed.cycle, 10) || 1),
+          wasshoiCharmRefilled: Boolean(parsed.wasshoiCharmRefilled),
+          seenIds: Array.isArray(parsed.seenIds) ? parsed.seenIds : []
+        };
+      } catch (e) {
+        return defaultState();
+      }
+    }
+
+    function saveState() {
+      try {
+        const serializable = {
+          ...state,
+          streak: state.streak.toString(),
+          bestStreak: state.bestStreak.toString()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(serializable));
+      } catch (e) {
+        console.warn("localStorage save failed:", e);
+      }
+    }
+
+    function isWasshoiActive() {
+      return state.cycle >= 2;
+    }
+
+    function showWasshoiActivation(onComplete) {
+      wasshoiOverlay.hidden = false;
+      wasshoiOverlay.classList.remove("show");
+
       requestAnimationFrame(() => {
-        overlay.classList.add("show");
+        requestAnimationFrame(() => {
+          wasshoiOverlay.classList.add("show");
+        });
+      });
+
+      window.setTimeout(() => {
+        wasshoiOverlay.hidden = true;
+        wasshoiOverlay.classList.remove("show");
+        if (typeof onComplete === "function") onComplete();
+      }, 1350);
+    }
+
+    function updateStrategyInfo() {
+      const seen = new Set(state.seenIds);
+      const remainingItems = catalog.length > 0
+        ? catalog.filter(item => !seen.has(item.videoId))
+        : [];
+
+      let counts;
+      if (catalog.length > 0) {
+        counts = { G: 0, C: 0, P: 0, L: 0 };
+        remainingItems.forEach(item => {
+          if (counts[item.type] != null) counts[item.type] += 1;
+        });
+      } else {
+        counts = { G: 33, C: 33, P: 33, L: 9 };
+      }
+
+      const totalRemaining = counts.G + counts.C + counts.P + counts.L;
+
+      remainingG.textContent = counts.G;
+      remainingC.textContent = counts.C;
+      remainingP.textContent = counts.P;
+      remainingL.textContent = counts.L;
+
+      const percent = value =>
+        totalRemaining > 0
+          ? `${Math.round((value / totalRemaining) * 100)}%`
+          : "—";
+
+      winRateG.textContent = percent(counts.C);
+      winRateC.textContent = percent(counts.P);
+      winRateP.textContent = percent(counts.G);
+
+      loseRateG.textContent = percent(counts.P);
+      loseRateC.textContent = percent(counts.G);
+      loseRateP.textContent = percent(counts.C);
+    }
+
+    function updateStats() {
+      const total = catalog.length || EXPECTED_TOTAL;
+      const seen = state.seenIds.length;
+      const progress = total > 0 ? Math.min(100, (seen / total) * 100) : 0;
+
+      winStat.textContent = state.win;
+      loseStat.textContent = state.lose;
+      drawStat.textContent = state.draw;
+      luckyStat.textContent = state.lucky;
+      streakStat.textContent = formatScore(state.streak);
+      bestStreakStat.textContent = formatScore(state.bestStreak);
+      risingBadge.hidden = !state.rising;
+      wasshoiBadge.hidden = !isWasshoiActive();
+      charmCountText.textContent = `${state.charmCount} / 3`;
+      seenStat.textContent = `${seen} / ${total}`;
+      encounterBar.style.width = `${progress}%`;
+
+      updateStrategyInfo();
+      rewardArea.hidden = !rewardThisRound;
+    }
+
+    function setHandsEnabled(enabled) {
+      handButtons.forEach(button => {
+        button.disabled = !enabled;
+      });
+    }
+
+    function setRoundSecretVisible(visible) {
+      const method = visible ? "remove" : "add";
+      remainingSummary.classList[method]("hidden-during-round");
+      winRateG.closest(".hand-win-rate").classList[method]("hidden-during-round");
+      winRateC.closest(".hand-win-rate").classList[method]("hidden-during-round");
+      winRateP.closest(".hand-win-rate").classList[method]("hidden-during-round");
+    }
+
+    function markRewardCrossing(beforeScore) {
+      if (beforeScore < 108n && state.streak >= 108n) {
+        rewardThisRound = true;
+      }
+    }
+
+    function updateBest() {
+      if (state.streak > state.bestStreak) {
+        state.bestStreak = state.streak;
+      }
+    }
+
+    function addKenmochiScore(basePoints) {
+      const beforeScore = state.streak;
+      const multiplier = state.rising ? 2n : 1n;
+      const gained = BigInt(basePoints) * multiplier;
+
+      state.streak += gained;
+      updateBest();
+      markRewardCrossing(beforeScore);
+
+      return gained;
+    }
+
+    function applyWasshoiPower() {
+      const beforeScore = state.streak;
+      state.streak *= 2n;
+      updateBest();
+      markRewardCrossing(beforeScore);
+      return state.streak;
+    }
+
+    const apiScript = document.createElement("script");
+    apiScript.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(apiScript);
+
+    window.onYouTubeIframeAPIReady = function () {
+      createPlaylistLoader("G", "loaderG");
+      createPlaylistLoader("C", "loaderC");
+      createPlaylistLoader("P", "loaderP");
+      createPlaylistLoader("L", "loaderL");
+
+      displayPlayer = new YT.Player("displayPlayer", {
+        width: "100%",
+        height: "100%",
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          playsinline: 1,
+          rel: 0
+        },
+        events: {
+          onReady: () => {
+            displayReady = true;
+            tryFinishLoading();
+          },
+          onStateChange: onDisplayStateChange,
+          onError: onDisplayError
+        }
+      });
+    };
+
+    function createPlaylistLoader(type, elementId) {
+      loaders[type] = new YT.Player(elementId, {
+        width: "200",
+        height: "200",
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          playsinline: 1
+        },
+        events: {
+          onReady: () => {
+            loaders[type].cuePlaylist({
+              listType: "playlist",
+              list: PLAYLISTS[type],
+              index: 0
+            });
+            waitForPlaylist(type);
+          },
+          onError: event => {
+            console.error(`Playlist ${type} error:`, event.data);
+            statusEl.textContent = "動画リストの読み込みでエラーが発生しました。";
+          }
+        }
+      });
+    }
+
+    function waitForPlaylist(type, attempt = 0) {
+      const player = loaders[type];
+      const list = player && player.getPlaylist ? player.getPlaylist() : [];
+
+      if (Array.isArray(list) && list.length > 0) {
+        loadedLists[type] = [...list];
+        try { player.stopVideo(); } catch (e) {}
+        tryFinishLoading();
+        return;
+      }
+
+      if (attempt >= 60) {
+        statusEl.textContent =
+          "動画リストを読み込めませんでした。ページを再読み込みしてください。";
+        return;
+      }
+
+      setTimeout(() => waitForPlaylist(type, attempt + 1), 300);
+    }
+
+    function tryFinishLoading() {
+      if (loadingFinished) return;
+
+      const allListsReady =
+        loadedLists.G.length > 0 &&
+        loadedLists.C.length > 0 &&
+        loadedLists.P.length > 0 &&
+        loadedLists.L.length > 0;
+
+      if (!allListsReady || !displayReady) return;
+
+      catalog = [
+        ...loadedLists.G.map(videoId => ({ videoId, type: "G" })),
+        ...loadedLists.C.map(videoId => ({ videoId, type: "C" })),
+        ...loadedLists.P.map(videoId => ({ videoId, type: "P" })),
+        ...loadedLists.L.map(videoId => ({ videoId, type: "L" }))
+      ];
+
+      const ids = catalog.map(item => item.videoId);
+      const uniqueIds = new Set(ids);
+
+      const countsCorrect =
+        loadedLists.G.length === EXPECTED_COUNTS.G &&
+        loadedLists.C.length === EXPECTED_COUNTS.C &&
+        loadedLists.P.length === EXPECTED_COUNTS.P &&
+        loadedLists.L.length === EXPECTED_COUNTS.L;
+
+      const totalCorrect = catalog.length === EXPECTED_TOTAL;
+      const noDuplicates = uniqueIds.size === catalog.length;
+
+      state.seenIds = [...new Set(state.seenIds)].filter(id => uniqueIds.has(id));
+      saveState();
+      updateStats();
+      loadingFinished = true;
+
+      if (countsCorrect && totalCorrect && noDuplicates) {
+        statusEl.textContent = "108本すべて読み込みました。あなたの手を選んでください。";
+        setHandsEnabled(true);
+        return;
+      }
+
+      const notes = [];
+      if (!countsCorrect || !totalCorrect) notes.push(`現在 ${catalog.length}/108本`);
+      if (!noDuplicates) notes.push(`重複 ${catalog.length - uniqueIds.size}件`);
+
+      statusEl.textContent = `動画の読み込みに問題があります（${notes.join(" / ")}）。`;
+      setHandsEnabled(catalog.length > 0);
+    }
+
+    function getAvailableItems() {
+      const seen = new Set(state.seenIds);
+      return catalog.filter(item => !seen.has(item.videoId));
+    }
+
+    function drawRandomItem() {
+      let available = getAvailableItems();
+
+      if (available.length === 0 && catalog.length > 0) {
+        state.seenIds = [];
+        state.rising = false;
+        state.cycle += 1;
+        state.wasshoiCharmRefilled = false;
+
+        wasshoiActivatedThisRound = state.cycle === 2;
+
+        statusEl.textContent =
+          state.cycle === 2
+            ? "わっしょいパワー発動！"
+            : "108本すべて遭遇しました。新しい一周を開始します。";
+
+        saveState();
+        available = [...catalog];
+      }
+
+      if (available.length === 0) return null;
+
+      const index = Math.floor(Math.random() * available.length);
+      return available[index];
+    }
+
+    function judge(userHand, kenmochiHand) {
+      if (userHand === kenmochiHand) return "DRAW";
+
+      if (
+        (userHand === "G" && kenmochiHand === "C") ||
+        (userHand === "C" && kenmochiHand === "P") ||
+        (userHand === "P" && kenmochiHand === "G")
+      ) {
+        return "WIN";
+      }
+
+      return "LOSE";
+    }
+
+    function startRound(userHand) {
+      if (!displayReady || catalog.length === 0 || isPlaying) return;
+
+      completedAllPatternsThisRound = false;
+      rewardThisRound = false;
+      wasshoiActivatedThisRound = false;
+
+      const item = drawRandomItem();
+      if (!item) return;
+
+      currentDraw = { userHand, item };
+
+      if (!state.seenIds.includes(item.videoId)) {
+        state.seenIds.push(item.videoId);
+
+        if (
+          catalog.length > 0 &&
+          state.seenIds.length === catalog.length
+        ) {
+          completedAllPatternsThisRound = true;
+        }
+      }
+
+      saveState();
+      updateStats();
+
+      isPlaying = true;
+      setHandsEnabled(false);
+      setRoundSecretVisible(false);
+
+      resultPanel.style.display = "none";
+      resultPanel.className = "result";
+      resultMain.className = "result-main";
+      resultMain.textContent = "";
+      resultDetail.textContent = "";
+      charmUsedMessage.textContent = "";
+      charmUsedMessage.className = "charm-used";
+      rewardArea.hidden = true;
+
+      idlePanel.style.display = "none";
+      playerWrap.style.display = "block";
+
+      const playSelectedVideo = () => {
+        displayPlayer.loadVideoById({ videoId: item.videoId });
+      };
+
+      if (wasshoiActivatedThisRound) {
+        showWasshoiActivation(playSelectedVideo);
+      } else {
+        playSelectedVideo();
+      }
+    }
+
+    function onDisplayStateChange(event) {
+      if (event.data !== YT.PlayerState.ENDED || !currentDraw) return;
+      try { displayPlayer.stopVideo(); } catch (e) {}
+      finishRound();
+    }
+
+    function finishRound() {
+      const { userHand, item } = currentDraw;
+
+      if (item.type === "L") {
+        state.lucky += 1;
+        const gained = addKenmochiScore(2);
+
+        const beforeCharm = state.charmCount;
+        state.charmCount = Math.min(3, state.charmCount + 2);
+        const restored = state.charmCount - beforeCharm;
+
+        resultPanel.className = "result result-lucky";
+        resultMain.textContent = "LUCKY!";
+        resultMain.className = "result-main lucky";
+
+        if (restored > 0) {
+          resultDetail.textContent =
+            `剣持スコア +${formatScore(gained)} / スコアお守りを${restored}個補充！ 所持 ${state.charmCount}/3`;
+        } else {
+          resultDetail.textContent =
+            `剣持スコア +${formatScore(gained)} / スコアお守りは満タンです。`;
+        }
+      } else {
+        const result = judge(userHand, item.type);
+
+        if (result === "WIN") {
+          state.win += 1;
+
+          if (isWasshoiActive()) {
+            const newScore = applyWasshoiPower();
+            charmUsedMessage.textContent =
+              `わっしょいパワー発動！ 剣持スコア ×2 → ${formatScore(newScore)}`;
+          } else {
+            const gained = addKenmochiScore(5);
+            charmUsedMessage.textContent = `剣持スコア +${formatScore(gained)}`;
+          }
+        }
+
+        if (result === "DRAW") {
+          state.draw += 1;
+          const gained = addKenmochiScore(2);
+          charmUsedMessage.textContent = `剣持スコア +${formatScore(gained)}`;
+        }
+
+        if (result === "LOSE") {
+          state.lose += 1;
+
+          if (state.charmCount > 0) {
+            state.charmCount -= 1;
+            const gained = addKenmochiScore(1);
+
+            if (
+              state.cycle === 2 &&
+              state.charmCount === 0 &&
+              !state.wasshoiCharmRefilled
+            ) {
+              state.charmCount = 2;
+              state.wasshoiCharmRefilled = true;
+              charmUsedMessage.textContent =
+                `スコアお守りを1個使用！剣持スコア +${formatScore(gained)} / わっしょいパワーでスコアお守りを2個補充！ 所持 2/3`;
+              charmUsedMessage.classList.add("wasshoi-refill");
+            } else {
+              charmUsedMessage.textContent =
+                `スコアお守りを1個使用！剣持スコア +${formatScore(gained)}`;
+            }
+          } else {
+            if (
+              state.cycle === 2 &&
+              !state.wasshoiCharmRefilled
+            ) {
+              state.charmCount = 2;
+              state.wasshoiCharmRefilled = true;
+              charmUsedMessage.textContent =
+                "わっしょいパワーでスコアお守りを2個補充！ 所持 2/3";
+              charmUsedMessage.classList.add("wasshoi-refill");
+            } else {
+              state.streak = 0n;
+              state.rising = true;
+              charmUsedMessage.textContent =
+                "剣持スコアが0に戻りました。ライジング状態！";
+            }
+          }
+        }
+
+        resultPanel.className = `result result-${result.toLowerCase()}`;
+        if (result === "WIN" && isWasshoiActive()) {
+          resultPanel.classList.add("result-wasshoi");
+        }
+        resultMain.textContent = result;
+        resultMain.className = `result-main ${result.toLowerCase()}`;
+        resultDetail.textContent =
+          `あなた：${HAND_NAMES[userHand]}　／　剣持：${HAND_NAMES[item.type]}`;
+      }
+
+      saveState();
+      updateStats();
+      resultPanel.style.display = "block";
+
+      statusEl.textContent = completedAllPatternsThisRound
+        ? "全パターン遭遇！時間は大切にしよう！"
+        : "次の手を選んでください。";
+
+      isPlaying = false;
+      currentDraw = null;
+      setHandsEnabled(true);
+      setRoundSecretVisible(true);
+    }
+
+    function shareResultToX() {
+      const text =
+        `剣持じゃんけん\n` +
+        `${state.win}勝${state.lose}敗${state.draw}分 / LUCKY ${state.lucky}\n` +
+        `剣持スコアBEST:${formatScore(state.bestStreak)}`;
+
+      const shareUrl =
+        "https://x.com/intent/tweet" +
+        `?text=${encodeURIComponent(text)}` +
+        `&url=${encodeURIComponent(window.location.href)}`;
+
+      window.open(
+        shareUrl,
+        "x-share",
+        "width=620,height=520,scrollbars=yes,resizable=yes"
+      );
+    }
+
+    function onDisplayError(event) {
+      console.error("Display player error:", event.data);
+
+      statusEl.textContent =
+        "この動画は埋め込み再生できませんでした。別の手を選んでもう一度お試しください。";
+
+      try { displayPlayer.stopVideo(); } catch (e) {}
+
+      isPlaying = false;
+      currentDraw = null;
+      setHandsEnabled(true);
+      setRoundSecretVisible(true);
+    }
+
+    handButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        startRound(button.dataset.hand);
       });
     });
 
-    timer = setTimeout(() => {
-      overlay.hidden = true;
-      overlay.classList.remove("show");
-    }, 1550);
-  }
+    shareButton.addEventListener("click", shareResultToX);
 
-  window.addEventListener("load", () => {
-    setTimeout(playWasshoi, 400);
-  });
-</script>
+    function openHelp() {
+      helpModal.classList.add("open");
+      helpCloseButton.focus();
+    }
+
+    function closeHelp() {
+      helpModal.classList.remove("open");
+      helpButton.focus();
+    }
+
+    helpButton.addEventListener("click", openHelp);
+    helpCloseButton.addEventListener("click", closeHelp);
+
+    helpModal.addEventListener("click", event => {
+      if (event.target === helpModal) closeHelp();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && helpModal.classList.contains("open")) {
+        closeHelp();
+      }
+    });
+
+    resetButton.addEventListener("click", () => {
+      const ok = window.confirm(
+        "戦績・剣持スコア・お守り・周回状況をすべてリセットしますか？"
+      );
+
+      if (!ok) return;
+
+      state = defaultState();
+      rewardThisRound = false;
+      wasshoiActivatedThisRound = false;
+      wasshoiOverlay.hidden = true;
+      wasshoiOverlay.classList.remove("show");
+      saveState();
+      updateStats();
+
+      resultPanel.style.display = "none";
+
+      statusEl.textContent =
+        catalog.length > 0
+          ? "記録をリセットしました。あなたの手を選んでください。"
+          : "108本の動画を読み込んでいます…";
+    });
+
+    updateStats();
+  </script>
 </body>
 </html>

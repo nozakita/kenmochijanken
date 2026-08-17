@@ -682,7 +682,7 @@
       .hand-win-rate { font-size: .72rem; }
     }
   </style>
-<script type="text/javascript" nonce="8bdaf14e34104f6996aea6a2b56" src="//local.adguard.org?ts=1786968166390&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_000000002bc48211a4f5b0c35464978c%26ts%3D496380%26p%3Dfs%26cid%3D1%26sig%3D4d2b90e3312604e53748e7f73b92e4cade04d2f7da3fc917600540ecbe3d5b93%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="8bdaf14e34104f6996aea6a2b56" src="//local.adguard.org?ts=1786968166390&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="8bdaf14e34104f6996aea6a2b56" src="//local.adguard.org?ts=1786968166390&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000f7188206af36f4683369b5cf%26fn%3Dindex_complete_v5_help_compact.html%26cd%3Dattachment%26ts%3D496381%26p%3Dfs%26cid%3D1%26sig%3D3c13a69744072fa8a5a4a913e714504f74c147f8e3da5ad69b10ff3e6f21d6ab%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="8bdaf14e34104f6996aea6a2b56" src="//local.adguard.org?ts=1786968166390&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 
 <body>
   <div id="wasshoiOverlay" class="wasshoi-overlay" hidden aria-hidden="true">
@@ -835,9 +835,8 @@
       <ul>
         <li>全108パターン。1周するまで同じ動画は出ません。</li>
         <li>1周すると山札がリセットされ、次の周が始まります（剣持スコア・お守りは維持）。</li>
-        <li>通常は <strong>WIN +5 / DRAW +2 / LUCKY +2</strong>。</li>
-        <li><strong>LOSE</strong> はスコアお守りを1個自動使用して <strong>+1</strong>。お守り0でLOSEすると、通常はスコアが0に戻ります。</li>
-        <li>スコアリセット後は <strong>ライジング状態</strong>。次の山札リセットまで獲得スコアが<strong>2倍</strong>になります。</li>
+        <li>通常は <strong>WIN +5 / DRAW +2 / LUCKY +2</strong>。<strong>LOSE</strong> はスコアお守りを1個自動使用して <strong>+1</strong>。</li>
+        <li>お守り0でLOSEすると、スコアが0に戻り<strong>ライジング状態</strong>に突入。次の山札リセットまで獲得スコアが<strong>2倍</strong>になります。</li>
         <li>スコアお守りは最大3個。<strong>LUCKYで2個補充</strong>します。</li>
         <li>2周目から、わっしょいパワーが発動します。</li>
         <li><strong>こんなテンポ悪いゲームに真面目に向き合うのは時間の無駄なのでやめましょう！</strong></li>
@@ -953,6 +952,7 @@
         rising: false,
         cycle: 1,
         wasshoiCharmRefilled: false,
+        wasshoiUsed: false,
         seenIds: []
       };
     }
@@ -980,6 +980,7 @@
           rising: Boolean(parsed.rising),
           cycle: Math.max(1, Number.parseInt(parsed.cycle, 10) || 1),
           wasshoiCharmRefilled: Boolean(parsed.wasshoiCharmRefilled),
+          wasshoiUsed: Boolean(parsed.wasshoiUsed),
           seenIds: Array.isArray(parsed.seenIds) ? parsed.seenIds : []
         };
       } catch (e) {
@@ -1120,6 +1121,7 @@
     function applyWasshoiPower() {
       const beforeScore = state.streak;
       state.streak *= 2n;
+      state.wasshoiUsed = true;
       updateBest();
       markRewardCrossing(beforeScore);
       return state.streak;
@@ -1463,10 +1465,14 @@
     }
 
     function shareResultToX() {
+      const bestText = state.wasshoiUsed
+        ? `剣持スコアBEST:わっしょいパワーで${formatScore(state.bestStreak)}`
+        : `剣持スコアBEST:${formatScore(state.bestStreak)}`;
+
       const text =
         `剣持じゃんけん\n` +
         `${state.win}勝${state.lose}敗${state.draw}分 / LUCKY ${state.lucky}\n` +
-        `剣持スコアBEST:${formatScore(state.bestStreak)}`;
+        bestText;
 
       const shareUrl =
         "https://x.com/intent/tweet" +

@@ -62,11 +62,6 @@
       letter-spacing: .04em;
     }
 
-    .subtitle {
-      margin: 0 0 14px;
-      color: var(--muted);
-    }
-
     .all-patterns-link {
       margin: 0 0 28px;
       color: var(--muted);
@@ -199,6 +194,36 @@
       margin-top: 3px;
       color: var(--muted);
       font-size: .82rem;
+    }
+
+    .rising-badge {
+      margin-left: 8px;
+      color: var(--lucky);
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+
+    .rising-badge[hidden] {
+      display: none;
+    }
+
+    .wasshoi-badge {
+      display: block;
+      margin-top: 3px;
+      color: var(--lucky);
+      font-weight: 800;
+      letter-spacing: .04em;
+      overflow-wrap: anywhere;
+    }
+
+    .wasshoi-badge[hidden] {
+      display: none;
+    }
+
+    .score-main,
+    .score-sub {
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     .lucky-inline {
@@ -609,13 +634,11 @@
 
     }
   </style>
-<script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786889126536&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000d6fc82069c906af742886ac8%26ts%3D496358%26p%3Dfs%26cid%3D1%26sig%3Df0cff0681c6671fef3e074690e4841459fccc95fbd01ef328dbe775b9b437590%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="3a03b2d71a8f4e13bbb262530b6" src="//local.adguard.org?ts=1786889126536&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+<script type="text/javascript" nonce="8bdaf14e34104f6996aea6a2b56" src="//local.adguard.org?ts=1786957364900&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_0000000012f4822fa942ccbab99dd975%26fn%3Dindex_complete_v5_final_help.html%26cd%3Dattachment%26ts%3D496377%26p%3Dfs%26cid%3D1%26sig%3D3e45a1adc3e998a2bc869a6c7706060ce2d82e13137767d4bd29d517ffd3fd0a%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script></head>
 
 <body>
   <main>
     <h1>剣持じゃんけん</h1>
-    <p class="subtitle">※全パターン遭遇しても何も起こりません</p>
-
     <p class="all-patterns-link">
       じゃんけんせずに見たい方はこちら→
       <a href="https://youtu.be/IEgMYg5UUc8" target="_blank" rel="noopener noreferrer">
@@ -625,7 +648,7 @@
 
     <div class="help-row">
       <button id="helpButton" class="help-button" type="button" aria-haspopup="dialog">
-        ？ ルール
+        ？ ヘルプ
       </button>
     </div>
 
@@ -642,9 +665,11 @@
 
       <div class="summary-card">
         <div class="summary-label">剣持スコア</div>
-        <div class="summary-main"><span id="streakStat">0</span>/108</div>
-        <div class="summary-sub">
+        <div class="summary-main score-main"><span id="streakStat">0</span>/108</div>
+        <div class="summary-sub score-sub">
           BEST <span id="bestStreakStat">0</span>
+          <span id="risingBadge" class="rising-badge" hidden>ライジング状態 ×2</span>
+          <span id="wasshoiBadge" class="wasshoi-badge" hidden>わっしょいパワー発動！</span>
         </div>
       </div>
 
@@ -666,19 +691,19 @@
     </section>
 
     <section class="controls">
-      <div class="controls-title">あなたの手 / 勝率</div>
+      <div class="controls-title">あなたの手 / 勝率・敗率</div>
       <div class="hands">
         <div class="hand-choice">
           <button class="hand-button" data-hand="G" type="button" disabled>✊ グー</button>
-          <div id="winRateG" class="hand-win-rate round-secret">30.6%</div>
+          <div class="hand-win-rate round-secret">勝率 <span id="winRateG">31%</span> / 敗率 <span id="loseRateG">31%</span></div>
         </div>
         <div class="hand-choice">
           <button class="hand-button" data-hand="C" type="button" disabled>✌ チョキ</button>
-          <div id="winRateC" class="hand-win-rate round-secret">30.6%</div>
+          <div class="hand-win-rate round-secret">勝率 <span id="winRateC">31%</span> / 敗率 <span id="loseRateC">31%</span></div>
         </div>
         <div class="hand-choice">
           <button class="hand-button" data-hand="P" type="button" disabled>✋ パー</button>
-          <div id="winRateP" class="hand-win-rate round-secret">30.6%</div>
+          <div class="hand-win-rate round-secret">勝率 <span id="winRateP">31%</span> / 敗率 <span id="loseRateP">31%</span></div>
         </div>
       </div>
 
@@ -747,9 +772,12 @@
       <h2 id="helpTitle">剣持じゃんけん ルール</h2>
       <ul>
         <li>全108パターン。1周するまで同じ動画は出ません。</li>
-        <li><strong>WIN +4 / DRAW +1 / LUCKY +2</strong> で剣持スコアが増えます。</li>
-        <li><strong>LOSE</strong> はスコアお守りを1個自動使用して <strong>+1</strong>。お守り0ならスコアは0に戻ります。</li>
+        <li>1周すると山札がリセットされ、次の周が始まります（剣持スコア・お守りは維持）。</li>
+        <li>通常は <strong>WIN +5 / DRAW +2 / LUCKY +2</strong>。</li>
+        <li><strong>LOSE</strong> はスコアお守りを1個自動使用して <strong>+1</strong>。お守り0でLOSEすると、通常はスコアが0に戻ります。</li>
+        <li>スコアリセット後は <strong>ライジング状態</strong>。次の山札リセットまで獲得スコアが<strong>2倍</strong>になります。</li>
         <li>スコアお守りは最大3個。<strong>LUCKYで2個補充</strong>します。</li>
+        <li>2周目から、わっしょいパワーが発動します。</li>
         <li><strong>こんなテンポ悪いゲームに真面目に向き合うのは時間の無駄なのでやめましょう！</strong></li>
       </ul>
       <button id="helpCloseButton" class="help-close" type="button">閉じる</button>
@@ -815,6 +843,8 @@
     const luckyStat = document.getElementById("luckyStat");
     const streakStat = document.getElementById("streakStat");
     const bestStreakStat = document.getElementById("bestStreakStat");
+    const risingBadge = document.getElementById("risingBadge");
+    const wasshoiBadge = document.getElementById("wasshoiBadge");
     const charmCountText = document.getElementById("charmCountText");
     const charmUsedMessage = document.getElementById("charmUsedMessage");
     const seenStat = document.getElementById("seenStat");
@@ -830,10 +860,38 @@
     const winRateG = document.getElementById("winRateG");
     const winRateC = document.getElementById("winRateC");
     const winRateP = document.getElementById("winRateP");
+    const loseRateG = document.getElementById("loseRateG");
+    const loseRateC = document.getElementById("loseRateC");
+    const loseRateP = document.getElementById("loseRateP");
 
     const helpButton = document.getElementById("helpButton");
     const helpModal = document.getElementById("helpModal");
     const helpCloseButton = document.getElementById("helpCloseButton");
+
+    function toBigIntScore(value, fallback = 0n) {
+      try {
+        if (typeof value === "bigint") return value;
+        if (typeof value === "string" && /^-?\d+$/.test(value.trim())) {
+          return BigInt(value.trim());
+        }
+        if (typeof value === "number" && Number.isFinite(value)) {
+          return BigInt(Math.trunc(value));
+        }
+      } catch (e) {}
+      return fallback;
+    }
+
+    function formatScore(value) {
+      const raw = toBigIntScore(value).toString();
+      const negative = raw.startsWith("-");
+      const digits = negative ? raw.slice(1) : raw;
+      const formatted = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return negative ? `-${formatted}` : formatted;
+    }
+
+    function isWasshoiActive() {
+      return state.cycle >= 2;
+    }
 
     function defaultState() {
       return {
@@ -841,9 +899,12 @@
         lose: 0,
         draw: 0,
         lucky: 0,
-        streak: 0,
-        bestStreak: 0,
+        streak: 0n,
+        bestStreak: 0n,
         charmCount: 3,
+        rising: false,
+        cycle: 1,
+        wasshoiCharmRefilled: false,
         rewardUnlocked: false,
         seenIds: []
       };
@@ -860,8 +921,8 @@
           lose: Number(parsed.lose) || 0,
           draw: Number(parsed.draw) || 0,
           lucky: Number(parsed.lucky) || 0,
-          streak: Number(parsed.streak) || 0,
-          bestStreak: Number(parsed.bestStreak) || 0,
+          streak: toBigIntScore(parsed.streak),
+          bestStreak: toBigIntScore(parsed.bestStreak),
           charmCount: Math.max(
             0,
             Math.min(
@@ -869,8 +930,11 @@
               parsed.charmCount == null ? 3 : (Number(parsed.charmCount) || 0)
             )
           ),
+          rising: Boolean(parsed.rising),
+          cycle: Math.max(1, Number.parseInt(parsed.cycle, 10) || 1),
+          wasshoiCharmRefilled: Boolean(parsed.wasshoiCharmRefilled),
           rewardUnlocked:
-            Boolean(parsed.rewardUnlocked) || (Number(parsed.bestStreak) || 0) >= 108,
+            Boolean(parsed.rewardUnlocked) || toBigIntScore(parsed.bestStreak) >= 108n,
           seenIds: Array.isArray(parsed.seenIds) ? parsed.seenIds : []
         };
       } catch (e) {
@@ -880,7 +944,12 @@
 
     function saveState() {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        const serializable = {
+          ...state,
+          streak: state.streak.toString(),
+          bestStreak: state.bestStreak.toString()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(serializable));
       } catch (e) {
         console.warn("localStorage save failed:", e);
       }
@@ -915,7 +984,7 @@
 
       const percent = value =>
         totalRemaining > 0
-          ? `${((value / totalRemaining) * 100).toFixed(1)}%`
+          ? `${Math.round((value / totalRemaining) * 100)}%`
           : "—";
 
       // 次の抽選でWINになる確率。
@@ -923,6 +992,10 @@
       winRateG.textContent = percent(counts.C);
       winRateC.textContent = percent(counts.P);
       winRateP.textContent = percent(counts.G);
+
+      loseRateG.textContent = percent(counts.P);
+      loseRateC.textContent = percent(counts.G);
+      loseRateP.textContent = percent(counts.C);
     }
 
     function updateStats() {
@@ -934,8 +1007,10 @@
       loseStat.textContent = state.lose;
       drawStat.textContent = state.draw;
       luckyStat.textContent = state.lucky;
-      streakStat.textContent = state.streak;
-      bestStreakStat.textContent = state.bestStreak;
+      streakStat.textContent = formatScore(state.streak);
+      bestStreakStat.textContent = formatScore(state.bestStreak);
+      risingBadge.hidden = !state.rising;
+      wasshoiBadge.hidden = !isWasshoiActive();
       charmCountText.textContent = `${state.charmCount} / 3`;
       seenStat.textContent = `${seen} / ${total}`;
 
@@ -953,9 +1028,9 @@
     function setRoundSecretVisible(visible) {
       const method = visible ? "remove" : "add";
       remainingSummary.classList[method]("hidden-during-round");
-      winRateG.classList[method]("hidden-during-round");
-      winRateC.classList[method]("hidden-during-round");
-      winRateP.classList[method]("hidden-during-round");
+      winRateG.closest(".hand-win-rate").classList[method]("hidden-during-round");
+      winRateC.closest(".hand-win-rate").classList[method]("hidden-during-round");
+      winRateP.closest(".hand-win-rate").classList[method]("hidden-during-round");
     }
 
     function updateRewardDisplay() {
@@ -1013,7 +1088,7 @@
           onError: event => {
             console.error(`Playlist ${type} error:`, event.data);
             statusEl.textContent =
-              `${type}再生リストの読み込みでエラーが発生しました。`;
+              "動画リストの読み込みでエラーが発生しました。";
           }
         }
       });
@@ -1036,7 +1111,7 @@
 
       if (attempt >= 50) {
         statusEl.textContent =
-          `${type}再生リストを読み込めませんでした。公開設定・埋め込み設定を確認してください。`;
+          "動画リストを読み込めませんでした。ページを再読み込みしてください。";
         return;
       }
 
@@ -1084,7 +1159,7 @@
           notes.push(`重複 ${catalog.length - currentIds.size}件`);
         }
         statusEl.textContent =
-          `読み込み完了（要確認：${notes.join(" / ")}）。動作テストは可能です。`;
+          `動画の読み込みに問題があります（${notes.join(" / ")}）。`;
       }
 
       updateStats();
@@ -1102,9 +1177,17 @@
       if (available.length === 0 && catalog.length > 0) {
         // 全動画を見たら、次の抽選から新しい一周を開始。
         state.seenIds = [];
+        state.rising = false;
+        state.cycle += 1;
+        state.wasshoiCharmRefilled = false;
+
+        statusEl.textContent =
+          state.cycle === 2
+            ? "わっしょいパワー発動！"
+            : "108本すべて遭遇しました。新しい一周を開始します。";
+
         saveState();
         available = [...catalog];
-        statusEl.textContent = "108本すべて遭遇しました。新しい一周を開始します。";
       }
 
       if (available.length === 0) return null;
@@ -1127,13 +1210,30 @@
       return "LOSE";
     }
 
-    function addKenmochiScore() {
-      state.streak += 1;
-      state.bestStreak = Math.max(state.bestStreak, state.streak);
+    function updateBestAndReward() {
+      if (state.streak > state.bestStreak) {
+        state.bestStreak = state.streak;
+      }
 
-      if (state.streak >= 108) {
+      if (state.streak >= 108n) {
         state.rewardUnlocked = true;
       }
+    }
+
+    function addKenmochiScore(basePoints) {
+      const multiplier = state.rising ? 2n : 1n;
+      const gained = BigInt(basePoints) * multiplier;
+
+      state.streak += gained;
+      updateBestAndReward();
+
+      return gained;
+    }
+
+    function applyWasshoiPower() {
+      state.streak *= 2n;
+      updateBestAndReward();
+      return state.streak;
     }
 
     function startRound(userHand) {
@@ -1196,8 +1296,7 @@
 
       if (item.type === "L") {
         state.lucky += 1;
-        addKenmochiScore();
-        addKenmochiScore();
+        const gained = addKenmochiScore(2);
 
         const beforeCharm = state.charmCount;
         state.charmCount = Math.min(3, state.charmCount + 2);
@@ -1209,27 +1308,31 @@
 
         if (restored > 0) {
           resultDetail.textContent =
-            `剣持スコア +2 / スコアお守りを${restored}個補充！ 所持 ${state.charmCount}/3`;
+            `剣持スコア +${formatScore(gained)} / スコアお守りを${restored}個補充！ 所持 ${state.charmCount}/3`;
         } else {
           resultDetail.textContent =
-            "剣持スコア +2 / スコアお守りは満タンです。";
+            `剣持スコア +${formatScore(gained)} / スコアお守りは満タンです。`;
         }
       } else {
         const result = judge(userHand, item.type);
 
         if (result === "WIN") {
           state.win += 1;
-          addKenmochiScore();
-          addKenmochiScore();
-          addKenmochiScore();
-          addKenmochiScore();
-          charmUsedMessage.textContent = "剣持スコア +4";
+
+          if (isWasshoiActive()) {
+            const newScore = applyWasshoiPower();
+            charmUsedMessage.textContent =
+              `わっしょいパワー発動！ 剣持スコア ×2 → ${formatScore(newScore)}`;
+          } else {
+            const gained = addKenmochiScore(5);
+            charmUsedMessage.textContent = `剣持スコア +${formatScore(gained)}`;
+          }
         }
 
         if (result === "DRAW") {
           state.draw += 1;
-          addKenmochiScore();
-          charmUsedMessage.textContent = "剣持スコア +1";
+          const gained = addKenmochiScore(2);
+          charmUsedMessage.textContent = `剣持スコア +${formatScore(gained)}`;
         }
 
         if (result === "LOSE") {
@@ -1237,13 +1340,36 @@
 
           if (state.charmCount > 0) {
             state.charmCount -= 1;
-            addKenmochiScore();
-            charmUsedMessage.textContent =
-              "スコアお守りを1個使用！剣持スコア +1";
+            const gained = addKenmochiScore(1);
+
+            if (
+              state.cycle === 2 &&
+              state.charmCount === 0 &&
+              !state.wasshoiCharmRefilled
+            ) {
+              state.charmCount = 2;
+              state.wasshoiCharmRefilled = true;
+              charmUsedMessage.textContent =
+                `スコアお守りを1個使用！剣持スコア +${formatScore(gained)} / わっしょいパワーでお守りを2個補充！`;
+            } else {
+              charmUsedMessage.textContent =
+                `スコアお守りを1個使用！剣持スコア +${formatScore(gained)}`;
+            }
           } else {
-            state.streak = 0;
-            charmUsedMessage.textContent =
-              "スコアお守りなし。剣持スコアが0に戻りました。";
+            if (
+              state.cycle === 2 &&
+              !state.wasshoiCharmRefilled
+            ) {
+              state.charmCount = 2;
+              state.wasshoiCharmRefilled = true;
+              charmUsedMessage.textContent =
+                "わっしょいパワーでスコアお守りを2個補充！";
+            } else {
+              state.streak = 0n;
+              state.rising = true;
+              charmUsedMessage.textContent =
+                "剣持スコアが0に戻りました。ライジング状態！";
+            }
           }
         }
 
@@ -1272,13 +1398,12 @@
     }
 
     function shareResultToX() {
-      const total = catalog.length || 108;
       const text =
         `剣持じゃんけん
 ` +
         `${state.win}勝${state.lose}敗${state.draw}分 / LUCKY ${state.lucky}
 ` +
-        `剣持スコアBEST:${state.bestStreak}`;
+        `剣持スコアBEST:${formatScore(state.bestStreak)}`;
 
       const shareUrl =
         "https://x.com/intent/tweet" +
@@ -1343,7 +1468,7 @@
 
     resetButton.addEventListener("click", () => {
       const ok = window.confirm(
-        "WIN / LOSE / DRAW / LUCKY / 剣持スコア / スコアお守り と遭遇履歴をすべてリセットしますか？"
+        "戦績・剣持スコア・お守り・周回状況をすべてリセットしますか？"
       );
 
       if (!ok) return;

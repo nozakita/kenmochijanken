@@ -4,9 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- 正式公開時に削除 -->
-  <meta name="robots" content="noindex, nofollow">
-
   <title>剣持じゃんけん</title>
   <meta name="description" content="剣持じゃんけん">
 
@@ -138,6 +135,23 @@
     .score-sub {
       overflow-wrap: anywhere;
       word-break: break-word;
+    }
+
+    #streakStat {
+      transition: color .2s ease, text-shadow .2s ease;
+    }
+
+    #streakStat.score-digit-3 { color: #f4d35e; }
+    #streakStat.score-digit-4 { color: #78d7ff; }
+    #streakStat.score-digit-5 { color: #c79cff; }
+    #streakStat.score-digit-6 {
+      color: #ff8b8b;
+      text-shadow: 0 0 7px rgba(255, 139, 139, .24);
+    }
+
+    #streakStat.score-digit-7plus {
+      color: #ffd75e;
+      text-shadow: 0 0 10px rgba(255, 215, 94, .55);
     }
 
     .lucky-inline {
@@ -682,7 +696,6 @@
       .hand-win-rate { font-size: .72rem; }
     }
   </style>
-<script type="text/javascript" nonce="8bdaf14e34104f6996aea6a2b56" src="//local.adguard.org?ts=1786968166390&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000f7188206af36f4683369b5cf%26fn%3Dindex_complete_v5_help_compact.html%26cd%3Dattachment%26ts%3D496381%26p%3Dfs%26cid%3D1%26sig%3D3c13a69744072fa8a5a4a913e714504f74c147f8e3da5ad69b10ff3e6f21d6ab%26v%3D0&amp;app=msedge.exe&amp;css=2&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=1"></script><script type="text/javascript" nonce="8bdaf14e34104f6996aea6a2b56" src="//local.adguard.org?ts=1786968166390&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
 
 <body>
   <div id="wasshoiOverlay" class="wasshoi-overlay" hidden aria-hidden="true">
@@ -839,7 +852,6 @@
         <li>お守り0でLOSEすると、スコアが0に戻り<strong>ライジング状態</strong>に突入。次の山札リセットまで獲得スコアが<strong>2倍</strong>になります。</li>
         <li>スコアお守りは最大3個。<strong>LUCKYで2個補充</strong>します。</li>
         <li>2周目から、わっしょいパワーが発動します。</li>
-        <li><strong>こんなテンポ悪いゲームに真面目に向き合うのは時間の無駄なのでやめましょう！</strong></li>
       </ul>
       <button id="helpCloseButton" class="help-close" type="button">閉じる</button>
     </div>
@@ -874,6 +886,7 @@
     let completedAllPatternsThisRound = false;
     let rewardThisRound = false;
     let wasshoiActivatedThisRound = false;
+    let wasshoiOverlayTimer = null;
 
     let state = loadState();
 
@@ -1015,7 +1028,12 @@
         });
       });
 
-      window.setTimeout(() => {
+      if (wasshoiOverlayTimer !== null) {
+        window.clearTimeout(wasshoiOverlayTimer);
+      }
+
+      wasshoiOverlayTimer = window.setTimeout(() => {
+        wasshoiOverlayTimer = null;
         wasshoiOverlay.hidden = true;
         wasshoiOverlay.classList.remove("show");
         if (typeof onComplete === "function") onComplete();
@@ -1059,6 +1077,32 @@
       loseRateP.textContent = percent(counts.C);
     }
 
+    function updateScoreColor() {
+      const scoreDigits = state.streak < 0n
+        ? (-state.streak).toString().length
+        : state.streak.toString().length;
+
+      streakStat.classList.remove(
+        "score-digit-3",
+        "score-digit-4",
+        "score-digit-5",
+        "score-digit-6",
+        "score-digit-7plus"
+      );
+
+      if (scoreDigits >= 7) {
+        streakStat.classList.add("score-digit-7plus");
+      } else if (scoreDigits >= 6) {
+        streakStat.classList.add("score-digit-6");
+      } else if (scoreDigits >= 5) {
+        streakStat.classList.add("score-digit-5");
+      } else if (scoreDigits >= 4) {
+        streakStat.classList.add("score-digit-4");
+      } else if (state.streak >= 108n) {
+        streakStat.classList.add("score-digit-3");
+      }
+    }
+
     function updateStats() {
       const total = catalog.length || EXPECTED_TOTAL;
       const seen = state.seenIds.length;
@@ -1069,6 +1113,7 @@
       drawStat.textContent = state.draw;
       luckyStat.textContent = state.lucky;
       streakStat.textContent = formatScore(state.streak);
+      updateScoreColor();
       bestStreakStat.textContent = formatScore(state.bestStreak);
       risingBadge.hidden = !state.rising;
       wasshoiBadge.hidden = !isWasshoiActive();
@@ -1494,6 +1539,8 @@
 
       try { displayPlayer.stopVideo(); } catch (e) {}
 
+      playerWrap.style.display = "none";
+      idlePanel.style.display = "block";
       isPlaying = false;
       currentDraw = null;
       setHandsEnabled(true);
@@ -1538,15 +1585,34 @@
 
       if (!ok) return;
 
+      if (wasshoiOverlayTimer !== null) {
+        window.clearTimeout(wasshoiOverlayTimer);
+        wasshoiOverlayTimer = null;
+      }
+
+      completedAllPatternsThisRound = false;
+      isPlaying = false;
+      currentDraw = null;
+
+      try {
+        if (displayPlayer && typeof displayPlayer.stopVideo === "function") {
+          displayPlayer.stopVideo();
+        }
+      } catch (e) {}
+
       state = defaultState();
       rewardThisRound = false;
       wasshoiActivatedThisRound = false;
       wasshoiOverlay.hidden = true;
       wasshoiOverlay.classList.remove("show");
+      playerWrap.style.display = "none";
+      idlePanel.style.display = "block";
       saveState();
       updateStats();
 
       resultPanel.style.display = "none";
+      setRoundSecretVisible(true);
+      setHandsEnabled(loadingFinished && catalog.length > 0);
 
       statusEl.textContent =
         catalog.length > 0
